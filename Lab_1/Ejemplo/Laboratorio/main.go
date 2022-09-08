@@ -1,61 +1,100 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
-	"context"
+	"math/rand"
 	"net"
+	"time"
+
+	pb "github.com/Kendovvul/Ejemplo/Proto"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc"
-	pb "github.com/Kendovvul/Ejemplo/Proto"
 )
 
 type server struct {
 	pb.UnimplementedMessageServiceServer
 }
 
-func (s *server) Intercambio (ctx context.Context, msg *pb.Message) (*pb.Message, error){
-	fmt.Println(msg.Body)
-	return &pb.Message{Body: "NO",}, nil
+var serv *grpc.Server
+var msg_intercambio string
+var CASO_RESUELTO = "SI, RESUELTO"
+var CASO_NEGATIVO = "AUN NO"
+
+func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message, error) {
+	fmt.Println("La central dice: " + msg.Body)
+	if rand.Float32() <= 0.6 {
+		//defer serv.Stop()
+		fmt.Printf("Situacion Resuelta!\n")
+		msg_intercambio = CASO_RESUELTO
+		return &pb.Message{Body: msg_intercambio}, nil
+	}
+	msg_intercambio = CASO_NEGATIVO
+	return &pb.Message{Body: msg_intercambio}, nil
 }
 
 func main() {
-	LabName := "Laboratiorio Pripyat" //nombre del laboratorio
-	qName := "Emergencias" //nombre de la cola
-	hostQ := "localhost" //ip del servidor de RabbitMQ 172.17.0.1
-	connQ, err := amqp.Dial("amqp://guest:guest@"+hostQ+":5672") //conexion con RabbitMQ
-	
-	if err != nil {log.Fatal(err)}
+	rand.Seed(time.Now().UnixNano())
+
+	LabName := "Laboratiorio Pripyat"                                //nombre del laboratorio
+	qName := "Emergencias"                                           //nombre de la cola
+	hostQ := "localhost"                                             //ip del servidor de RabbitMQ 172.17.0.1
+	connQ, err := amqp.Dial("amqp://guest:guest@" + hostQ + ":5672") //conexion con RabbitMQ
+
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer connQ.Close()
 
 	ch, err := connQ.Channel()
-	if err != nil{log.Fatal(err)}
-	defer ch.Close()
-
-	//Mensaje enviado a la cola de RabbitMQ (Llamado de emergencia)
-	err = ch.Publish("", qName, false, false,
-		amqp.Publishing{
-			Headers: nil,
-			ContentType: "text/plain",
-			Body: []byte(LabName),  //Contenido del mensaje
-		})
-
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(LabName)
-
-	listener, err := net.Listen("tcp", ":50051") //conexion sincrona
-	if err != nil {
-		panic("La conexion no se pudo crear" + err.Error())
-	}
-
-	serv := grpc.NewServer()
+	defer ch.Close()
 	for {
+		for {
+			fmt.Printf("Todo bien... por ahora\n")
+			time.Sleep(5 * time.Second)
+			if rand.Float32() <= 0.8 {
+				msg_intercambio = ""
+				fmt.Printf("Estallido detectado!\n")
+				//Mensaje enviado a la cola de RabbitMQ (Llamado de emergencia)
+				err = ch.Publish("", qName, false, false,
+					amqp.Publishing{
+						Headers:     nil,
+						ContentType: "text/plain",
+						Body:        []byte(LabName), //Contenido del mensaje
+					})
+
+				if err != nil {
+					fmt.Printf("error")
+					log.Fatal(err)
+				}
+				break
+			}
+		}
+		fmt.Println(LabName)
+
+		listener, err := net.Listen("tcp", ":50051") //conexion sincrona
+		if err != nil {
+			panic("La conexion no se pudo crear" + err.Error())
+		}
+
+		serv = grpc.NewServer()
+		//defer serv.Stop()
+		//for {
 		pb.RegisterMessageServiceServer(serv, &server{})
+
 		if err = serv.Serve(listener); err != nil {
 			panic("El server no se pudo iniciar" + err.Error())
 		}
+		for {
+			if msg_intercambio == CASO_RESUELTO {
+				serv.Stop()
+				break
+			}
+		}
 	}
+
 }

@@ -5,6 +5,7 @@ package grpc;
 option go_package = "SD/LAB1/proto";
 
 message Message {
+    //esto podria ser dos strings, para mensaje y para la estacion
     string body = 1;
 }
 
