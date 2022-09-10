@@ -19,8 +19,9 @@ type server struct {
 
 var serv *grpc.Server
 var msg_intercambio string
-var CASO_RESUELTO = "SI, RESUELTO"
-var CASO_NEGATIVO = "AUN NO"
+var CASO_RESUELTO = "SI, ESTALLIDO CONTROLADO"
+var CASO_NEGATIVO = "NO, ESTALLIDO AUN ACTIVO"
+var listener net.Listener
 
 func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message, error) {
 	fmt.Println("La central dice: " + msg.Body)
@@ -45,16 +46,17 @@ func empezarServicio(serv *grpc.Server, listener net.Listener) {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	LabName := "Laboratiorio Pripyat"                                //nombre del laboratorio
-	qName := "Emergencias"                                           //nombre de la cola
-	hostQ := "localhost"                                             //ip del servidor de RabbitMQ 172.17.0.1
+	LabName := "Laboratorio Pohang" //nombre del laboratorio
+	qName := "Emergencias"          //nombre de la cola
+	hostQ := "localhost"            //ip del servidor de RabbitMQ 172.17.0.1
+
 	connQ, err := amqp.Dial("amqp://guest:guest@" + hostQ + ":5672") //conexion con RabbitMQ
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer connQ.Close()
 
+	defer connQ.Close()
 	ch, err := connQ.Channel()
 	if err != nil {
 		log.Fatal(err)
@@ -92,7 +94,7 @@ func main() {
 		}
 		//fmt.Println(LabName)
 
-		listener, err := net.Listen("tcp", ":50051") //conexion sincrona
+		listener, err := net.Listen("tcp", ":50053") //conexion sincrona
 		if err != nil {
 			panic("La conexion no se pudo crear" + err.Error())
 		}
@@ -113,6 +115,7 @@ func main() {
 				//fmt.Printf("ENTRA\n")
 				time.Sleep(time.Second * 1)
 				serv.Stop()
+				listener.Close()
 				break
 			}
 		}

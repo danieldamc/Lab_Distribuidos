@@ -11,6 +11,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var CASO_RESUELTO = "SI, ESTALLIDO CONTROLADO"
+
 func main() {
 	qName := "Emergencias"                                           //Nombre de la cola
 	hostQ := "localhost"                                             //Host de RabbitMQ 172.17.0.1
@@ -42,10 +44,33 @@ func main() {
 			log.Fatal(err)
 		}
 		for delivery := range chDelivery {
-			port := ":50051" //puerto de la conexion con el laboratorio
+			var port string
+			port_lab1 := ":50051" //puerto de la conexion con el laboratorio Pripyat
+			port_lab2 := ":50052" //puerto de la conexion con el laboratorio Kampala
+			port_lab3 := ":50053" //puerto de la conexion con el laboratorio Pohang
+			port_lab4 := ":50054" //puerto de la conexion con el laboratorio Renca
 			fmt.Printf("--------------------------------\n")
 			fmt.Println("Pedido de ayuda de " + string(delivery.Body)) //obtiene el primer mensaje de la cola
-			fmt.Println(q)
+			//fmt.Println(q)
+
+			if string(delivery.Body) == "Laboratorio Pripyat" {
+				//fmt.Printf("pripyat momento\n")
+				port = port_lab1
+			}
+			if string(delivery.Body) == "Laboratorio Kampala" {
+				//fmt.Printf("kampala momento\n")
+				port = port_lab2
+			}
+			if string(delivery.Body) == "Laboratorio Pohang" {
+				//fmt.Printf("pohang momento\n")
+				port = port_lab3
+			}
+			if string(delivery.Body) == "Laboratorio Renca" {
+				//fmt.Printf("renca momento\n")
+				port = port_lab4
+			}
+
+			//fmt.Println(port)
 			connS, err := grpc.Dial(hostS+port, grpc.WithInsecure()) //crea la conexion sincrona con el laboratorio
 
 			if err != nil {
@@ -68,18 +93,19 @@ func main() {
 
 				defer connS.Close() //defer cierra connS al final del for
 
-				fmt.Println(res.Body) //respuesta del laboratorio
-				if res.Body == "SI, RESUELTO" {
-					fmt.Printf("Desconectando...\n")
+				fmt.Println(string(delivery.Body) + " ha enviado: " + res.Body) //respuesta del laboratorio
+				if res.Body == CASO_RESUELTO {
+					fmt.Printf("Escuadron Retornando...\n")
 					connS.Close()
-					fmt.Printf(connS.GetState().String() + "\n")
+					//fmt.Printf(connS.GetState().String() + "\n")
 					break
 				}
 				time.Sleep(5 * time.Second) //espera de 5 segundos
 			}
-			if len(chDelivery) == 0 {
-				break
-			}
+			/*
+				if len(chDelivery) == 0 {
+					break
+				}*/
 		}
 	}
 
