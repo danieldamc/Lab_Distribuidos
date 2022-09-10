@@ -41,9 +41,9 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		for delivery := range chDelivery {
-			port := ":50051"                                           //puerto de la conexion con el laboratorio
+			port := ":50051" //puerto de la conexion con el laboratorio
+			fmt.Printf("--------------------------------\n")
 			fmt.Println("Pedido de ayuda de " + string(delivery.Body)) //obtiene el primer mensaje de la cola
 			fmt.Println(q)
 			connS, err := grpc.Dial(hostS+port, grpc.WithInsecure()) //crea la conexion sincrona con el laboratorio
@@ -61,7 +61,7 @@ func main() {
 						Body: "Equipo listo?",
 					})
 
-				fmt.Printf(connS.GetState().String() + "\n")
+				//fmt.Printf(connS.GetState().String() + "\n")
 				if err != nil {
 					panic("No se puede crear el mensaje " + err.Error())
 				}
@@ -69,8 +69,10 @@ func main() {
 				defer connS.Close() //defer cierra connS al final del for
 
 				fmt.Println(res.Body) //respuesta del laboratorio
-				if res.Body == "SI, RESUELTA" {
+				if res.Body == "SI, RESUELTO" {
+					fmt.Printf("Desconectando...\n")
 					connS.Close()
+					fmt.Printf(connS.GetState().String() + "\n")
 					break
 				}
 				time.Sleep(5 * time.Second) //espera de 5 segundos
