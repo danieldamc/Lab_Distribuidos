@@ -56,7 +56,7 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 
 		fmt.Println(string(delivery.Body) + " ha enviado: " + res.Body) //respuesta del laboratorio
 		if res.Body == CASO_RESUELTO {
-			fmt.Printf("Escuadron Retornando...\n")
+			fmt.Printf("Escuadron Retornando desde " + string(delivery.Body) + "...\n")
 			connS.Close()
 			m.Lock()
 			ESCUADRONES_DISPONIBLES += 1
@@ -71,10 +71,16 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 func main() {
 	ESCUADRONES_DISPONIBLES = 2
 	var port string
-	qName = "Emergencias"                                            //Nombre de la cola
-	hostQ = "localhost"                                              //Host de RabbitMQ 172.17.0.1
-	hostS = "localhost"                                              //Host de un Laboratorio
-	connQ, err := amqp.Dial("amqp://guest:guest@" + hostQ + ":5672") //Conexion con RabbitMQ
+	/*
+		qName = "Emergencias"                                            //Nombre de la cola
+		hostQ = "localhost"                                              //Host de RabbitMQ 172.17.0.1
+		hostS = "localhost"                                              //Host de un Laboratorio
+		connQ, err := amqp.Dial("amqp://guest:guest@" + hostQ + ":5672") //Conexion con RabbitMQ
+	*/
+	qName = "Emergencias"                                          //Nombre de la cola
+	hostQ = "localhost"                                            //Host de RabbitMQ 172.17.0.1
+	hostS = "dist149"                                              //Host de un Laboratorio
+	connQ, err := amqp.Dial("amqp://test:test@" + hostQ + ":5672") //Conexion con RabbitMQ
 
 	if err != nil {
 		log.Fatal(err)
@@ -111,9 +117,9 @@ func main() {
 				m.Lock()
 				if ESCUADRONES_DISPONIBLES < 1 {
 					m.Unlock()
-					fmt.Printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+					fmt.Printf("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 					fmt.Printf("Ningun Escuadron disponible,\nDebemos esperar que retorne uno\n")
-					fmt.Printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+					fmt.Printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 					time.Sleep(time.Second * 5)
 				} else {
 					m.Unlock()
@@ -128,7 +134,7 @@ func main() {
 
 			fmt.Printf("--------------------------------\n")
 			fmt.Println("numero de escuadrones disponibles: " + strconv.Itoa(ESCUADRONES_DISPONIBLES))
-			fmt.Println("Pedido de ayuda de " + string(delivery.Body)) //obtiene el primer mensaje de la cola
+			fmt.Println("Pedido de ayuda de " + string(delivery.Body) + ". Enviando escuadron...") //obtiene el primer mensaje de la cola
 			//fmt.Println(q)
 			m.Unlock()
 

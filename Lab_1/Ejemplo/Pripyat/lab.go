@@ -46,11 +46,18 @@ func empezarServicio(serv *grpc.Server, listener net.Listener) {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
+	/*
+		LabName := "Laboratorio Pripyat" //nombre del laboratorio
+		qName := "Emergencias"           //nombre de la cola
+		hostQ := "localhost"             //ip del servidor de RabbitMQ 172.17.0.1
+
+		connQ, err := amqp.Dial("amqp://guest:guest@" + hostQ + ":5672") //conexion con RabbitMQ
+	*/
 	LabName := "Laboratorio Pripyat" //nombre del laboratorio
 	qName := "Emergencias"           //nombre de la cola
-	hostQ := "localhost"             //ip del servidor de RabbitMQ 172.17.0.1
+	hostQ := "dist149"               //ip del servidor de RabbitMQ 172.17.0.1
 
-	connQ, err := amqp.Dial("amqp://guest:guest@" + hostQ + ":5672") //conexion con RabbitMQ
+	connQ, err := amqp.Dial("amqp://test:test@" + hostQ + ":5672") //conexion con RabbitMQ
 
 	if err != nil {
 		log.Fatal(err)
