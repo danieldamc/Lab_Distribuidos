@@ -2,7 +2,7 @@ central:
 	go run Central/main.go
 
 laboratorio:
-	HOSTNAME_S := $(shell hostname)
-	ifeq ($(HOSTNAME_S),dist149)
+	HOST = $(shell hostname)
+	ifeq ($(HOST),dist149)
 		go run Pripyat/lab.go
 	endif
