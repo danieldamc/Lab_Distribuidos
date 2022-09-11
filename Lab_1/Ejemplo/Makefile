@@ -4,5 +4,5 @@ central:
 HOST = $(shell hostname)
 laboratorio:
 ifeq ($(HOST),dist149)
-	echo "ok"
+	go run Pripyat/lab.go
 endif
