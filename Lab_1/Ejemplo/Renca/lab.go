@@ -48,7 +48,7 @@ func main() {
 
 	LabName := "Laboratorio Renca" //nombre del laboratorio
 	qName := "Emergencias"         //nombre de la cola
-	hostQ := "152"                 //ip del servidor de RabbitMQ 172.17.0.1
+	hostQ := "dist152"             //ip del servidor de RabbitMQ 172.17.0.1
 
 	connQ, err := amqp.Dial("amqp://test:test@" + hostQ + ":5672") //conexion con RabbitMQ
 
