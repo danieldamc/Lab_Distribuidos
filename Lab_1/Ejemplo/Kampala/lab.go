@@ -27,11 +27,13 @@ func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message,
 	fmt.Println("La central dice: " + msg.Body)
 	if rand.Float32() <= 0.6 {
 		//defer serv.Stop()
-		fmt.Printf("Situacion Resuelta!\n")
+		//fmt.Printf("Situacion Resuelta!\n")
+		fmt.Printf("Estallido contenido, Escuadron Retornando...\n")
 		msg_intercambio = CASO_RESUELTO
 		return &pb.Message{Body: msg_intercambio}, nil
 	}
 	msg_intercambio = CASO_NEGATIVO
+	fmt.Printf("Revisando estado Escuadron: NO LISTO\n")
 	return &pb.Message{Body: msg_intercambio}, nil
 }
 
@@ -69,7 +71,7 @@ func main() {
 			time.Sleep(5 * time.Second)
 			if rand.Float32() <= 0.8 {
 				msg_intercambio = ""
-				fmt.Printf("Estallido detectado!\n")
+				fmt.Printf("Estallido detectado! SOS enviado a la central\n")
 				//Mensaje enviado a la cola de RabbitMQ (Llamado de emergencia)
 				//returns := ch.NotifyReturn(make(chan amqp.Return, 1))
 

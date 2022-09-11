@@ -4,9 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"sync"
+	"syscall"
 	"time"
+
+	"os/signal"
 
 	pb "github.com/Kendovvul/Ejemplo/Proto"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -24,6 +28,9 @@ var port_lab1 string
 var port_lab2 string
 var port_lab3 string
 var port_lab4 string
+
+var solicitudes [4]int
+var labs [4]string
 
 var m sync.Mutex
 
@@ -54,7 +61,7 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 
 		defer connS.Close() //defer cierra connS al final del for
 
-		fmt.Println(string(delivery.Body) + " ha enviado: " + res.Body) //respuesta del laboratorio
+		fmt.Println("Escuadron en " + string(delivery.Body) + " ha enviado: " + res.Body) //respuesta del laboratorio
 		if res.Body == CASO_RESUELTO {
 			fmt.Printf("Escuadron Retornando desde " + string(delivery.Body) + "...\n")
 			connS.Close()
@@ -69,6 +76,25 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 }
 
 func main() {
+	solicitudes[0] = 0 //solicitudes hechas por laboratorio Pripyat
+	solicitudes[1] = 0 //solicitudes hechas por laboratorio Kampala
+	solicitudes[2] = 0 //solicitudes hechas por laboratorio Pohang
+	solicitudes[3] = 0 //solicitudes hechas por laboratorio Renca
+
+	labs[0] = "laboratorio Pripyat"
+	labs[1] = "laboratorio Kampala"
+	labs[2] = "laboratorio Pohang"
+	labs[3] = "laboratorio Renca"
+
+	//TODO: cerrar puertos y notificar
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		fmt.Printf("\nXD?\n")
+		os.Exit(1)
+	}()
+
 	ESCUADRONES_DISPONIBLES = 2
 	var port string
 	/*
@@ -135,29 +161,47 @@ func main() {
 			fmt.Printf("--------------------------------\n")
 			fmt.Println("numero de escuadrones disponibles: " + strconv.Itoa(ESCUADRONES_DISPONIBLES))
 			fmt.Println("Pedido de ayuda de " + string(delivery.Body) + ". Enviando escuadron...") //obtiene el primer mensaje de la cola
+
+			//escribir en el txt
+			f, err := os.Create("SOLICITUDES.txt")
+			if err != nil {
+				log.Fatal(err)
+			}
+			for i := 0; i < 4; i++ {
+				_, err2 := f.WriteString(labs[i] + ";" + strconv.Itoa(solicitudes[i]) + "\n")
+				if err2 != nil {
+					log.Fatal(err2)
+				}
+			}
+			f.Close()
+
 			//fmt.Println(q)
 			m.Unlock()
 
 			if string(delivery.Body) == "Laboratorio Pripyat" {
 				//fmt.Printf("pripyat momento\n")
+				solicitudes[0] += 1
 				hostS = "localhost"
 				port = port_lab1
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Kampala" {
 				//fmt.Printf("kampala momento\n")
+				solicitudes[1] += 1
 				hostS = "dist150"
 				port = port_lab2
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Pohang" {
 				//fmt.Printf("pohang momento\n")
+				solicitudes[2] += 1
 				hostS = "dist151"
 				port = port_lab3
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Renca" {
 				//fmt.Printf("renca momento\n")
+				solicitudes[3] += 1
 				hostS = "dist152"
 				port = port_lab4
 				go resolver_estallido(port, delivery)
