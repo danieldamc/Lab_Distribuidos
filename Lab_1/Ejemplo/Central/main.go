@@ -77,9 +77,9 @@ func main() {
 		hostS = "localhost"                                              //Host de un Laboratorio
 		connQ, err := amqp.Dial("amqp://guest:guest@" + hostQ + ":5672") //Conexion con RabbitMQ
 	*/
-	qName = "Emergencias"                                            //Nombre de la cola
-	hostQ = "localhost"                                              //Host de RabbitMQ 172.17.0.1
-	hostS = "localhost"                                              //Host de un Laboratorio
+	qName = "Emergencias" //Nombre de la cola
+	hostQ = "localhost"   //Host de RabbitMQ 172.17.0.1
+	//hostS = "localhost"                                              //Host de un Laboratorio
 	connQ, err := amqp.Dial("amqp://guest:guest@" + hostQ + ":5672") //Conexion con RabbitMQ
 
 	if err != nil {
@@ -140,21 +140,25 @@ func main() {
 
 			if string(delivery.Body) == "Laboratorio Pripyat" {
 				//fmt.Printf("pripyat momento\n")
+				hostS = "localhost"
 				port = port_lab1
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Kampala" {
 				//fmt.Printf("kampala momento\n")
+				hostS = "dist150"
 				port = port_lab2
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Pohang" {
 				//fmt.Printf("pohang momento\n")
+				hostS = "dist151"
 				port = port_lab3
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Renca" {
 				//fmt.Printf("renca momento\n")
+				hostS = "dist152"
 				port = port_lab4
 				go resolver_estallido(port, delivery)
 			}
