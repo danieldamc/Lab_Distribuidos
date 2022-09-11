@@ -30,7 +30,7 @@ var m sync.Mutex
 func resolver_estallido(port string, delivery amqp.Delivery) {
 	m.Lock()
 	ESCUADRONES_DISPONIBLES -= 1
-	m.Unlock()
+
 	connS, err := grpc.Dial(hostS+port, grpc.WithInsecure()) //crea la conexion sincrona con el laboratorio
 
 	if err != nil {
@@ -38,7 +38,7 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 	}
 
 	serviceCliente := pb.NewMessageServiceClient(connS)
-
+	m.Unlock()
 	for {
 		//envia el mensaje al laboratorio
 		time.Sleep(5 * time.Second) //espera de 5 segundos
@@ -100,10 +100,10 @@ func main() {
 
 	fmt.Println(q)
 
-	port_lab1 = ":50051" //puerto de la conexion con el laboratorio Pripyat
-	port_lab2 = ":50052" //puerto de la conexion con el laboratorio Kampala
-	port_lab3 = ":50053" //puerto de la conexion con el laboratorio Pohang
-	port_lab4 = ":50050" //puerto de la conexion con el laboratorio Renca
+	port_lab1 = ":50051" //puerto de la conexion con el laboratorio Pripyat 149
+	port_lab2 = ":50052" //puerto de la conexion con el laboratorio Kampala 150
+	port_lab3 = ":50053" //puerto de la conexion con el laboratorio Pohang 151
+	port_lab4 = ":50050" //puerto de la conexion con el laboratorio Renca 152
 
 	for {
 		fmt.Println("Esperando Emergencias")
