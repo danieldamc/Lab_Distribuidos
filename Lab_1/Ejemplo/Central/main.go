@@ -103,7 +103,7 @@ func main() {
 	port_lab1 = ":50051" //puerto de la conexion con el laboratorio Pripyat
 	port_lab2 = ":50052" //puerto de la conexion con el laboratorio Kampala
 	port_lab3 = ":50053" //puerto de la conexion con el laboratorio Pohang
-	port_lab4 = ":50054" //puerto de la conexion con el laboratorio Renca
+	port_lab4 = ":50050" //puerto de la conexion con el laboratorio Renca
 
 	for {
 		fmt.Println("Esperando Emergencias")
