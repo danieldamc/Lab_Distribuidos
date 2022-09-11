@@ -1,18 +1,8 @@
-# Ejemplo
+# Laboratorio 1 - Sistemas Distribuidos
 
-## Version Ejecutable en local o en una sola maquina
+## Integrantes
+Daniel Martinez Castro 201973508-k  
+Tomas Nieto Guerrero 201973519-2  
 
-### Compilar proto
-    protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative Proto/message.proto
-
-### GO
-
-Ejecutar cada uno en una consola distinta.
-
-Para la central.
-    
-    go run Central/main.go
-
-Para el Laboratorio
-
-    go run Laboratorio/main.go
+## Ejecución
+aca va el bash
