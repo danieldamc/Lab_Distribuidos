@@ -1,8 +1,8 @@
 central:
 	go run Central/main.go
 
+HOST = $(shell hostname)
 laboratorio:
-	HOST = $(shell hostname)
-	ifeq ($(HOST),dist149)
-		go run Pripyat/lab.go
-	endif
+ifeq ($(HOST),dist149)
+	echo "ok"
+endif
