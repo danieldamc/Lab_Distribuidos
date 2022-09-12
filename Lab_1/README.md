@@ -16,7 +16,7 @@ Antes de ejecutar los programas se debe acceder a las máquinas virtuales que pa
 Ya ingresado en las VM el siguiente comando para llegar a la carpeta raíz de nuestro Laboratorio 1:
 
 ```
-cd !!!!!!!!!!!!!!!!!!hacer
+cd Lab_1/
 ```
 
 Dentro de esta ubicación se pueden hacer los siguientes comandos:
