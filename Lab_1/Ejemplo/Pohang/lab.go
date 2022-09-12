@@ -38,6 +38,7 @@ func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message,
 }
 
 func empezarServicio(serv *grpc.Server, listener net.Listener) {
+	time.Sleep(2 * time.Second * time.Duration(rand.Float32())) //para evitar colisiones
 	pb.RegisterMessageServiceServer(serv, &server{})
 	if err := serv.Serve(listener); err != nil {
 		panic("El server no se pudo iniciar" + err.Error())
