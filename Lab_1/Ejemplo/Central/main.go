@@ -167,13 +167,13 @@ func main() {
 			fmt.Println("Pedido de ayuda de " + string(delivery.Body) + ". Enviando escuadron...") //obtiene el primer mensaje de la cola
 
 			//fmt.Println(q)
-			m.Unlock()
 
 			if string(delivery.Body) == "Laboratorio Pripyat" {
 				//fmt.Printf("pripyat momento\n")
 				solicitudes[0] += 1
 				hostS = "localhost"
 				port = port_lab1
+				m.Unlock()
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Kampala" {
@@ -181,6 +181,7 @@ func main() {
 				solicitudes[1] += 1
 				hostS = "dist150"
 				port = port_lab2
+				m.Unlock()
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Pohang" {
@@ -188,6 +189,7 @@ func main() {
 				solicitudes[2] += 1
 				hostS = "dist151"
 				port = port_lab3
+				m.Unlock()
 				go resolver_estallido(port, delivery)
 			}
 			if string(delivery.Body) == "Laboratorio Renca" {
@@ -195,6 +197,7 @@ func main() {
 				solicitudes[3] += 1
 				hostS = "dist152"
 				port = port_lab4
+				m.Unlock()
 				go resolver_estallido(port, delivery)
 			}
 
