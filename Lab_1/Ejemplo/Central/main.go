@@ -76,15 +76,24 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 				panic("No se puede crear el mensaje " + err.Error())
 			}
 
-			if res.Body == CASO_CIERRE_RESPUESTA {
-				fmt.Printf("Escuadron Retornando desde " + string(delivery.Body) + "...\n")
-				connS.Close()
-				m.Lock()
-				ESCUADRONES_DISPONIBLES += 1
-				m.Unlock()
-				//fmt.Printf(connS.GetState().String() + "\n")
-				break
-			}
+			fmt.Printf(res.Body)
+			connS.Close()
+			m.Lock()
+			ESCUADRONES_DISPONIBLES += 1
+			m.Unlock()
+			//fmt.Printf(connS.GetState().String() + "\n")
+			break
+
+			/*
+				if res.Body == CASO_CIERRE_RESPUESTA {
+					fmt.Printf("Escuadron Retornando desde " + string(delivery.Body) + "...\n")
+					connS.Close()
+					m.Lock()
+					ESCUADRONES_DISPONIBLES += 1
+					m.Unlock()
+					//fmt.Printf(connS.GetState().String() + "\n")
+					break
+				}*/
 		}
 
 	}
