@@ -166,19 +166,6 @@ func main() {
 			fmt.Println("numero de escuadrones disponibles: " + strconv.Itoa(ESCUADRONES_DISPONIBLES))
 			fmt.Println("Pedido de ayuda de " + string(delivery.Body) + ". Enviando escuadron...") //obtiene el primer mensaje de la cola
 
-			//escribir en el txt
-			f, err := os.Create("SOLICITUDES.txt")
-			if err != nil {
-				log.Fatal(err)
-			}
-			for i := 0; i < 4; i++ {
-				_, err2 := f.WriteString(labs[i] + ";" + strconv.Itoa(solicitudes[i]) + "\n")
-				if err2 != nil {
-					log.Fatal(err2)
-				}
-			}
-			f.Close()
-
 			//fmt.Println(q)
 			m.Unlock()
 
@@ -211,6 +198,18 @@ func main() {
 				go resolver_estallido(port, delivery)
 			}
 
+			//escribir en el txt
+			f, err := os.Create("SOLICITUDES.txt")
+			if err != nil {
+				log.Fatal(err)
+			}
+			for i := 0; i < 4; i++ {
+				_, err2 := f.WriteString(labs[i] + ";" + strconv.Itoa(solicitudes[i]) + "\n")
+				if err2 != nil {
+					log.Fatal(err2)
+				}
+			}
+			f.Close()
 			//fmt.Println(port)
 
 			/*
