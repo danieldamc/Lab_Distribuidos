@@ -18,7 +18,7 @@ import (
 )
 
 var CASO_RESUELTO = "SI, ESTALLIDO CONTROLADO"
-var CASO_CIERRE = "cierre"
+var CASO_CIERRE = "cerrar"
 var CASO_CIERRE_RESPUESTA = "ok"
 var qName string
 var hostQ string
