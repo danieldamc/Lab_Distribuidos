@@ -21,9 +21,15 @@ var serv *grpc.Server
 var msg_intercambio string
 var CASO_RESUELTO = "SI, ESTALLIDO CONTROLADO"
 var CASO_NEGATIVO = "NO, ESTALLIDO AUN ACTIVO"
+var CASO_CIERRE = "cerrar"
+var CASO_CIERRE_RESPUESTA = "ok"
 var listener net.Listener
 
 func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message, error) {
+	if msg.Body == CASO_CIERRE {
+		msg_intercambio = CASO_CIERRE_RESPUESTA
+		return &pb.Message{Body: msg_intercambio}, nil
+	}
 	fmt.Println("La central dice: " + msg.Body)
 	if rand.Float32() <= 0.6 {
 		//defer serv.Stop()
@@ -38,7 +44,8 @@ func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message,
 }
 
 func empezarServicio(serv *grpc.Server, listener net.Listener) {
-	time.Sleep(2 * time.Second * time.Duration(rand.Float32())) //para evitar colisiones
+
+	//time.Sleep(2 * time.Second * time.Duration(rand.Float32())) //para evitar colisiones
 	pb.RegisterMessageServiceServer(serv, &server{})
 	if err := serv.Serve(listener); err != nil {
 		panic("El server no se pudo iniciar" + err.Error())
@@ -121,9 +128,9 @@ func main() {
 			} */
 
 		for {
-			if msg_intercambio == CASO_RESUELTO {
+			if msg_intercambio == CASO_CIERRE_RESPUESTA {
 				//fmt.Printf("ENTRA\n")
-				time.Sleep(time.Second * 3)
+				//time.Sleep(time.Second * 3)
 				serv.Stop()
 				listener.Close()
 				break

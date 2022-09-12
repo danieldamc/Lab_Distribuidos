@@ -18,6 +18,8 @@ import (
 )
 
 var CASO_RESUELTO = "SI, ESTALLIDO CONTROLADO"
+var CASO_CIERRE = "cierre"
+var CASO_CIERRE_RESPUESTA = "ok"
 var qName string
 var hostQ string
 var hostS string
@@ -63,13 +65,26 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 
 		fmt.Println("Escuadron en " + string(delivery.Body) + " ha enviado: " + res.Body) //respuesta del laboratorio
 		if res.Body == CASO_RESUELTO {
-			fmt.Printf("Escuadron Retornando desde " + string(delivery.Body) + "...\n")
-			connS.Close()
-			m.Lock()
-			ESCUADRONES_DISPONIBLES += 1
-			m.Unlock()
+
+			res, err := serviceCliente.Intercambio(context.Background(),
+				&pb.Message{
+					Body: CASO_CIERRE,
+				})
+
 			//fmt.Printf(connS.GetState().String() + "\n")
-			break
+			if err != nil {
+				panic("No se puede crear el mensaje " + err.Error())
+			}
+
+			if res.Body == CASO_CIERRE_RESPUESTA {
+				fmt.Printf("Escuadron Retornando desde " + string(delivery.Body) + "...\n")
+				connS.Close()
+				m.Lock()
+				ESCUADRONES_DISPONIBLES += 1
+				m.Unlock()
+				//fmt.Printf(connS.GetState().String() + "\n")
+				break
+			}
 		}
 
 	}
