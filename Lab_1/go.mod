@@ -1,4 +1,4 @@
-module github.com/danieldamc/Lab_Distribuidos/Lab_1/Proto
+module github.com/danieldamc/Lab_Distribuidos
 
 go 1.18
 
