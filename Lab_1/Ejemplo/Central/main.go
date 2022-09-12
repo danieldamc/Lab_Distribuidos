@@ -49,8 +49,10 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 	serviceCliente := pb.NewMessageServiceClient(connS)
 	m.Unlock()
 	for {
+
 		//envia el mensaje al laboratorio
 		time.Sleep(5 * time.Second) //espera de 5 segundos
+		m.Lock()
 		res, err := serviceCliente.Intercambio(context.Background(),
 			&pb.Message{
 				Body: "Equipo listo?",
@@ -78,7 +80,6 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 
 			fmt.Printf(res.Body)
 			connS.Close()
-			m.Lock()
 			ESCUADRONES_DISPONIBLES += 1
 			m.Unlock()
 			//fmt.Printf(connS.GetState().String() + "\n")
@@ -95,6 +96,7 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 					break
 				}*/
 		}
+		m.Unlock()
 
 	}
 }
