@@ -26,10 +26,7 @@ var CASO_CIERRE_RESPUESTA = "ok"
 var listener net.Listener
 
 func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message, error) {
-	if msg.Body == CASO_CIERRE {
-		msg_intercambio = CASO_CIERRE_RESPUESTA
-		return &pb.Message{Body: msg_intercambio}, nil
-	}
+
 	fmt.Println("La central dice: " + msg.Body)
 	if rand.Float32() <= 0.6 {
 		//defer serv.Stop()
@@ -120,9 +117,10 @@ func main() {
 			} */
 
 		for {
-			if msg_intercambio == CASO_CIERRE_RESPUESTA {
+			if msg_intercambio == CASO_RESUELTO {
 				//fmt.Printf("ENTRA\n")
 				//time.Sleep(time.Second * 3)
+				time.Sleep(time.Second * 1 / 100)
 				serv.Stop()
 				listener.Close()
 				break

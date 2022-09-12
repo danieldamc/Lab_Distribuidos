@@ -67,34 +67,25 @@ func resolver_estallido(port string, delivery amqp.Delivery) {
 
 		fmt.Println("Escuadron en " + string(delivery.Body) + " ha enviado: " + res.Body) //respuesta del laboratorio
 		if res.Body == CASO_RESUELTO {
+			/*
 
-			res, err := serviceCliente.Intercambio(context.Background(),
-				&pb.Message{
-					Body: CASO_CIERRE,
-				})
+				res, err := serviceCliente.Intercambio(context.Background(),
+					&pb.Message{
+						Body: CASO_CIERRE,
+					})
 
-			//fmt.Printf(connS.GetState().String() + "\n")
-			if err != nil {
-				panic("No se puede crear el mensaje " + err.Error())
-			}
+				//fmt.Printf(connS.GetState().String() + "\n")
+				if err != nil {
+					panic("No se puede crear el mensaje " + err.Error())
+				}
 
-			fmt.Printf(res.Body)
+				fmt.Printf(res.Body)
+			*/
 			connS.Close()
 			ESCUADRONES_DISPONIBLES += 1
 			m.Unlock()
 			//fmt.Printf(connS.GetState().String() + "\n")
 			break
-
-			/*
-				if res.Body == CASO_CIERRE_RESPUESTA {
-					fmt.Printf("Escuadron Retornando desde " + string(delivery.Body) + "...\n")
-					connS.Close()
-					m.Lock()
-					ESCUADRONES_DISPONIBLES += 1
-					m.Unlock()
-					//fmt.Printf(connS.GetState().String() + "\n")
-					break
-				}*/
 		}
 		m.Unlock()
 
