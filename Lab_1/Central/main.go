@@ -36,7 +36,7 @@ var labs [4]string
 
 var m sync.Mutex
 
-func resolver_estallido(port string, delivery amqp.Delivery) {
+func resolver_estallido(port string, delivery amqp.Delivery, hostS string) {
 	m.Lock()
 	ESCUADRONES_DISPONIBLES -= 1
 
@@ -191,7 +191,7 @@ func main() {
 				hostS = "localhost"
 				port = port_lab1
 				m.Unlock()
-				go resolver_estallido(port, delivery)
+				go resolver_estallido(port, delivery, hostS)
 			}
 			if string(delivery.Body) == "Laboratorio Kampala" {
 				//fmt.Printf("kampala momento\n")
@@ -199,7 +199,7 @@ func main() {
 				hostS = "dist150"
 				port = port_lab2
 				m.Unlock()
-				go resolver_estallido(port, delivery)
+				go resolver_estallido(port, delivery, hostS)
 			}
 			if string(delivery.Body) == "Laboratorio Pohang" {
 				//fmt.Printf("pohang momento\n")
@@ -207,7 +207,7 @@ func main() {
 				hostS = "dist151"
 				port = port_lab3
 				m.Unlock()
-				go resolver_estallido(port, delivery)
+				go resolver_estallido(port, delivery, hostS)
 			}
 			if string(delivery.Body) == "Laboratorio Renca" {
 				//fmt.Printf("renca momento\n")
@@ -215,7 +215,7 @@ func main() {
 				hostS = "dist152"
 				port = port_lab4
 				m.Unlock()
-				go resolver_estallido(port, delivery)
+				go resolver_estallido(port, delivery, hostS)
 			}
 
 			//escribir en el txt
