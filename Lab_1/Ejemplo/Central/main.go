@@ -124,6 +124,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	ch.QueuePurge(qName, false)
+	//ch.QueueDelete()
+
 	fmt.Println(q)
 
 	port_lab1 = ":50051" //puerto de la conexion con el laboratorio Pripyat 149
@@ -154,9 +157,10 @@ func main() {
 			}
 
 			m.Lock()
-			if ESCUADRONES_DISPONIBLES > 2 { //arreglar xd
-				ESCUADRONES_DISPONIBLES = 2
-			}
+			/*
+				if ESCUADRONES_DISPONIBLES > 2 { //arreglar xd
+					ESCUADRONES_DISPONIBLES = 2
+				}*/
 
 			fmt.Printf("--------------------------------\n")
 			fmt.Println("numero de escuadrones disponibles: " + strconv.Itoa(ESCUADRONES_DISPONIBLES))
