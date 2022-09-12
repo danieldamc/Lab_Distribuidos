@@ -1,4 +1,4 @@
-module github.com/Kendovvul/Ejemplo
+module github.com/danieldamc/Lab_Distribuidos/Lab_1/Proto
 
 go 1.18
 
