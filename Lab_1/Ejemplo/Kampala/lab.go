@@ -115,7 +115,7 @@ func main() {
 		for {
 			if msg_intercambio == CASO_RESUELTO {
 				//fmt.Printf("ENTRA\n")
-				time.Sleep(time.Second * 3)
+				time.Sleep(time.Second * 1 / 2)
 				serv.Stop()
 				listener.Close()
 				break
