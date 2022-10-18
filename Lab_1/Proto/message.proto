@@ -5,10 +5,17 @@ package grpc;
 option go_package = "SD/LAB1/proto";
 
 message Message {
-    //esto podria ser dos strings, para mensaje y para la estacion
+    string body = 1;
+}
+
+message Message2 {
     string body = 1;
 }
 
 service MessageService {
     rpc Intercambio (Message) returns (Message);
+}
+
+service FinService{
+    rpc Fin (Message2) returns (Message2);
 }

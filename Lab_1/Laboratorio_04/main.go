@@ -6,9 +6,10 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"os"
 	"time"
 
-	pb "github.com/Kendovvul/Ejemplo/Proto"
+	pb "github.com/Sistemas-Distribuidos-2022-2/Tarea1-Grupo38/Proto"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc"
 )
@@ -17,20 +18,25 @@ type server struct {
 	pb.UnimplementedMessageServiceServer
 }
 
+type server2 struct {
+	pb.UnimplementedFinServiceServer
+}
+
 var serv *grpc.Server
+var serv2 *grpc.Server
 var msg_intercambio string
 var CASO_RESUELTO = "SI, ESTALLIDO CONTROLADO"
 var CASO_NEGATIVO = "NO, ESTALLIDO AUN ACTIVO"
 var CASO_CIERRE = "cerrar"
 var CASO_CIERRE_RESPUESTA = "ok"
 var listener net.Listener
+var listener2 net.Listener
 
 func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message, error) {
 
 	fmt.Println("La central dice: " + msg.Body)
+	//calcula si el estallido es controlado
 	if rand.Float32() <= 0.6 {
-		//defer serv.Stop()
-		//fmt.Printf("Situacion Resuelta!\n")
 		fmt.Printf("Estallido contenido, Escuadron Retornando...\n")
 		msg_intercambio = CASO_RESUELTO
 		return &pb.Message{Body: msg_intercambio}, nil
@@ -40,10 +46,23 @@ func (s *server) Intercambio(ctx context.Context, msg *pb.Message) (*pb.Message,
 	return &pb.Message{Body: msg_intercambio}, nil
 }
 
+func (s *server2) Fin(ctx context.Context, msg *pb.Message2) (*pb.Message2, error) {
+	defer os.Exit(1)
+	fmt.Println("central ctrl+c")
+	return &pb.Message2{Body: "OK"}, nil
+}
+
 func empezarServicio(serv *grpc.Server, listener net.Listener) {
-	//time.Sleep(2 * time.Second * time.Duration(rand.Float32())) //para evitar colisiones
 	pb.RegisterMessageServiceServer(serv, &server{})
 	if err := serv.Serve(listener); err != nil {
+		panic("El server no se pudo iniciar" + err.Error())
+	}
+	return
+}
+
+func empezarServicio2(serv2 *grpc.Server, listener2 net.Listener) {
+	pb.RegisterFinServiceServer(serv2, &server2{})
+	if err := serv2.Serve(listener2); err != nil {
 		panic("El server no se pudo iniciar" + err.Error())
 	}
 	return
@@ -68,6 +87,14 @@ func main() {
 		log.Fatal(err)
 	}
 	defer ch.Close()
+
+	listener2, err := net.Listen("tcp", ":49003")
+	if err != nil {
+		panic("La conexion no se pudo crear" + err.Error())
+	}
+	serv2 = grpc.NewServer()
+	go empezarServicio2(serv2, listener2)
+
 	for {
 		for {
 			fmt.Printf("-----------------------\n")
@@ -77,7 +104,6 @@ func main() {
 				msg_intercambio = ""
 				fmt.Printf("Estallido detectado! SOS enviado a la central\n")
 				//Mensaje enviado a la cola de RabbitMQ (Llamado de emergencia)
-				//returns := ch.NotifyReturn(make(chan amqp.Return, 1))
 
 				err = ch.Publish("", qName, false, false,
 					amqp.Publishing{
@@ -86,11 +112,6 @@ func main() {
 						Body:        []byte(LabName), //Contenido del mensaje
 					})
 
-				/*
-					for r := range returns {
-						fmt.Println(r)
-					}
-				*/
 				if err != nil {
 					fmt.Printf("error")
 					log.Fatal(err)
@@ -98,7 +119,6 @@ func main() {
 				break
 			}
 		}
-		//fmt.Println(LabName)
 
 		listener, err := net.Listen("tcp", ":50050") //conexion sincrona
 		if err != nil {
@@ -106,21 +126,11 @@ func main() {
 		}
 
 		serv = grpc.NewServer()
-		//defer serv.Stop()
-		//for {
-		//pb.RegisterMessageServiceServer(serv, &server{})
 		go empezarServicio(serv, listener)
-
-		/*
-			if err = serv.Serve(listener); err != nil {
-				panic("El server no se pudo iniciar" + err.Error())
-			} */
 
 		for {
 			if msg_intercambio == CASO_RESUELTO {
-				//fmt.Printf("ENTRA\n")
-				//time.Sleep(time.Second * 3)
-				time.Sleep(time.Second * 1 / 3)
+				time.Sleep(time.Second * 1 / 100)
 				serv.Stop()
 				listener.Close()
 				break

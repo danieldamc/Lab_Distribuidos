@@ -2,4 +2,4 @@
 
 ### Integrantes
 Daniel Martinez Castro 201973508-k  
-Tomas Nieto Guerrero 201973519-2  
+Tomas Nieto Guerrero 201973529-2  
