@@ -6,7 +6,7 @@ option go_package = "SD/LAB1/proto";
 
 message Message {
     string tipo = 1;
-    int64 ID = 2;
+    int64 id = 2;
     string data = 3;
 }
 
