@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "SD/LAB1/proto";
+
+message Upload {
+    string type = 1;
+    int64 ID = 2;
+    string data = 3;
+}
+
+/*
+message Message {
+    string body = 1;
+}
+
+message Message2 {
+    string body = 1;
+}
+
+service MessageService {
+    rpc Intercambio (Message) returns (Message);
+}
+
+service FinService{
+    rpc Fin (Message2) returns (Message2);
+}*/
