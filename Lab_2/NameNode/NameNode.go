@@ -45,17 +45,18 @@ func upload_content(tipo_data string, id int, data string) {
 	res, err := service.Upload(context.Background(),
 		&pb.Message{
 			Tipo: tipo_data,
-			Id:   id,
+			Id:   int64(id),
 			Data: data,
 		})
 
 	if err != nil {
 		panic("No se puede crear el mensaje " + err.Error())
 	}
-
-	if res == RECIBIDO {
+	if res.Ack == "OK" {
 		connS.Close()
 	}
+
+	
 }
 
 func main() {
