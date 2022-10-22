@@ -17,7 +17,7 @@ type uploadserver struct {
 var uploadServer *grpc.Server
 var uploadLis net.Listener
 
-func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.Message, error) {
+func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
 	fmt.Println("La central dice: " + msg.Data)
 	return &pb.AckMessage{ack: "OK"}, nil
 }
