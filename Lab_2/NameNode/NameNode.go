@@ -3,35 +3,34 @@ package main
 import (
 	"context"
 
-	"google.golang.org/grpc"
 	"math/rand"
 	"time"
 
-	pb "github.com/danieldamc/Lab_Distribuidos/Lab_2/Proto"
 	"google.golang.org/grpc"
+
+	pb "github.com/danieldamc/Lab_Distribuidos/Lab_2/Proto"
 )
 
 var Grunt_port string
 var Synth_port string
 var Cremator_port string
 
-
 var RECIBIDO = "MENSAJE RECIBIDO"
 
-func upload_content(tipo string, id int, data string) {
+func upload_content(tipo_data string, id int, data string) {
 	var DataNode_Port string
 	var hostS string
-	eleccion = rand.Int(2)
+	var eleccion = rand.Intn(3)
 	if eleccion == 0 {
-		DataNode_Port = ":49000"
-		hostS = "dist149"
-	}else{
+		DataNode_Port = ":50000"
+		hostS = "localhost"
+	} else {
 		if eleccion == 1 {
-			DataNode_Port = ":49001"
-			hostS = "dist150"
-		}else{
-			DataNode_Port = ":49002"
-			hostS = "dist151"
+			DataNode_Port = ":50000"
+			hostS = "localhost"
+		} else {
+			DataNode_Port = ":50000"
+			hostS = "localhost"
 		}
 	}
 
@@ -45,16 +44,16 @@ func upload_content(tipo string, id int, data string) {
 
 	res, err := service.Upload(context.Background(),
 		&pb.Message{
-			type: tipo,
-			ID: id,
-			data: data,
+			Tipo: tipo_data,
+			Id:   id,
+			Data: data,
 		})
 
 	if err != nil {
 		panic("No se puede crear el mensaje " + err.Error())
 	}
 
-	if res == RECIBIDO{
+	if res == RECIBIDO {
 		connS.Close()
 	}
 }
