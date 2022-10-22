@@ -4,10 +4,14 @@ package grpc;
 
 option go_package = "SD/LAB1/proto";
 
-message Upload {
+message Message {
     string type = 1;
     int64 ID = 2;
     string data = 3;
+}
+
+service UploadService{
+    rpc Upload (Message) returns (Message);
 }
 
 /*
