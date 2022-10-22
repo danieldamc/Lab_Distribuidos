@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
+	"os"
+	"strconv"
 
 	pb "github.com/danieldamc/Lab_Distribuidos/Lab_2/Proto"
 	"google.golang.org/grpc"
@@ -17,9 +18,20 @@ type uploadserver struct {
 var uploadServer *grpc.Server
 var uploadLis net.Listener
 
+func appendtoFile(tipo string, id int, data string) {
+	file, err := os.OpenFile("file.txt", os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Println(err)
+	}
+	defer file.Close()
+	if _, err := file.WriteString(tipo + strconv.Itoa(id) + data); err != nil {
+		log.Fatal(err)
+	}
+}
+
 func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
-	fmt.Println("La central dice: " + msg.Data)
-	return &pb.AckMessage{ack: "OK"}, nil
+	appendtoFile(msg.Tipo, int(msg.Id), msg.Data)
+	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
 func main() {
