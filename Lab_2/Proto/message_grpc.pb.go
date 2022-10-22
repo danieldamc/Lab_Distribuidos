@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UploadServiceClient interface {
-	Upload(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
+	Upload(ctx context.Context, in *Message, opts ...grpc.CallOption) (*AckMessage, error)
 }
 
 type uploadServiceClient struct {
@@ -33,8 +33,8 @@ func NewUploadServiceClient(cc grpc.ClientConnInterface) UploadServiceClient {
 	return &uploadServiceClient{cc}
 }
 
-func (c *uploadServiceClient) Upload(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
-	out := new(Message)
+func (c *uploadServiceClient) Upload(ctx context.Context, in *Message, opts ...grpc.CallOption) (*AckMessage, error) {
+	out := new(AckMessage)
 	err := c.cc.Invoke(ctx, "/grpc.UploadService/Upload", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (c *uploadServiceClient) Upload(ctx context.Context, in *Message, opts ...g
 // All implementations must embed UnimplementedUploadServiceServer
 // for forward compatibility
 type UploadServiceServer interface {
-	Upload(context.Context, *Message) (*Message, error)
+	Upload(context.Context, *Message) (*AckMessage, error)
 	mustEmbedUnimplementedUploadServiceServer()
 }
 
@@ -54,7 +54,7 @@ type UploadServiceServer interface {
 type UnimplementedUploadServiceServer struct {
 }
 
-func (UnimplementedUploadServiceServer) Upload(context.Context, *Message) (*Message, error) {
+func (UnimplementedUploadServiceServer) Upload(context.Context, *Message) (*AckMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Upload not implemented")
 }
 func (UnimplementedUploadServiceServer) mustEmbedUnimplementedUploadServiceServer() {}
