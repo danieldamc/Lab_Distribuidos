@@ -19,7 +19,7 @@ var uploadLis net.Listener
 
 func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
 	fmt.Println("La central dice: " + msg.Data)
-	return &pb.AckMessage{ack: "OK"}, nil
+	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
 func main() {

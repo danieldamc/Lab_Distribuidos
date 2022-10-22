@@ -22,15 +22,15 @@ func upload_content(tipo_data string, id int, data string) {
 	var hostS string
 	var eleccion = rand.Intn(3)
 	if eleccion == 0 {
-		DataNode_Port = ":49000"
-		hostS = "dist149"
+		DataNode_Port = ":50000"
+		hostS = "localhost"
 	} else {
 		if eleccion == 1 {
-			DataNode_Port = ":49001"
-			hostS = "dist150"
+			DataNode_Port = ":50000"
+			hostS = "localhost"
 		} else {
-			DataNode_Port = ":49002"
-			hostS = "dist151"
+			DataNode_Port = ":50000"
+			hostS = "localhost"
 		}
 	}
 
@@ -44,9 +44,9 @@ func upload_content(tipo_data string, id int, data string) {
 
 	res, err := service.Upload(context.Background(),
 		&pb.Message{
-			tipo: tipo_data,
-			ID:   id,
-			data: data,
+			Tipo: tipo_data,
+			Id:   id,
+			Data: data,
 		})
 
 	if err != nil {
