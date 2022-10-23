@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -16,20 +17,20 @@ type uploadserver struct {
 }
 
 var uploadServer *grpc.Server
-var uploadLis net.Listener
 
 func appendtoFile(tipo string, id int, data string) {
-	file, err := os.OpenFile("file.txt", os.O_APPEND|os.O_WRONLY, 0644)
+	file, err := os.OpenFile("file.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		log.Println(err)
 	}
 	defer file.Close()
-	if _, err := file.WriteString(tipo + strconv.Itoa(id) + data); err != nil {
+	if _, err := file.WriteString(tipo + ":" + strconv.Itoa(id) + ":" + data + "\n"); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
+	fmt.Printf(msg.Tipo)
 	appendtoFile(msg.Tipo, int(msg.Id), msg.Data)
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
