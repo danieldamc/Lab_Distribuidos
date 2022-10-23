@@ -15,12 +15,12 @@ var Cremator_port string
 var RECIBIDO = "MENSAJE RECIBIDO"
 
 func upload_content(tipo_data string, id int, data string) {
-	var DataNode_Port string
+	var NameNode_Port string
 	var hostS string
-	DataNode_Port = ":50001"
+	NameNode_Port = ":50001"
 	hostS = "localhost"
 
-	connS, err := grpc.Dial(hostS+DataNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el NameNode
+	connS, err := grpc.Dial(hostS+NameNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el NameNode
 
 	if err != nil {
 		panic("No se pudo conectar con el servidor" + err.Error())
