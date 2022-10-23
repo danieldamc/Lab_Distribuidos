@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"os"
@@ -11,6 +12,13 @@ import (
 )
 
 func upload_content(tipo_data string, id int, data string) {
+	fmt.Printf("ENVIANDO...\n")
+	fmt.Printf(tipo_data)
+	fmt.Printf("\n")
+	fmt.Print(id)
+	fmt.Printf("\n")
+	fmt.Printf(data)
+	fmt.Printf("\n")
 	var NameNode_Port string
 	var hostS string
 	NameNode_Port = ":50001"
@@ -51,7 +59,10 @@ func main() {
 		fmt.Printf("	3: LOGISTICO\n")
 		fmt.Printf("	4: SALIR\n")
 
-		fmt.Scanln(&data_type)
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			data_type = scanner.Text()
+		}
 		if data_type == "4" {
 			os.Exit(1)
 		}
@@ -66,7 +77,9 @@ func main() {
 		}
 
 		fmt.Printf("INGRESE DATA DEL MENSAJE\n")
-		fmt.Scanln(&data_info)
+		if scanner.Scan() {
+			data_info = scanner.Text()
+		}
 		upload_content(data_type, 1, data_info)
 	}
 
