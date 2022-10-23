@@ -1,14 +1,24 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"strconv"
 
 	"google.golang.org/grpc"
+
+	pb "github.com/danieldamc/Lab_Distribuidos/Lab_2/Proto"
 )
 
 var RECIBIDO = "MENSAJE RECIBIDO"
 
-func retrieve_content(tipo_data string, id int, data string) {
+var downloadServer *grpc.Server
+
+type downloadserver struct {
+	pb.UnimplementedDownloadServiceServer
+}
+
+func retrieve_content(query string) {
 	var NameNode_Port string
 	var hostS string
 	NameNode_Port = ":50002"
@@ -20,27 +30,29 @@ func retrieve_content(tipo_data string, id int, data string) {
 		panic("No se pudo conectar con el servidor" + err.Error())
 	}
 
-	fmt.Print(connS)
+	service := pb.NewDownloadServiceClient(connS)
 
-	/*
-		service := pb.NewUploadServiceClient(connS)
+	res, err := service.Download(context.Background(),
+		&pb.RequestMessage{
+			Tipo: query,
+		})
 
-		res, err := service.Upload(context.Background(),
-			&pb.Message{
-				Tipo: tipo_data,
-				Id:   int64(id),
-				Data: data,
-			})
-
-		if err != nil {
-			panic("No se puede crear el mensaje " + err.Error())
+	if err != nil {
+		panic("No se puede crear el mensaje " + err.Error())
+	}
+	if res.Nmensajes == -1 || res.Nmensajes == 0 { //ELEMENTO NO ENCONTRADO
+		fmt.Printf("ELEMENTO NO ENCONTRADO\n")
+	} else {
+		fmt.Printf("Cantidad de mensaje descargados: " + strconv.Itoa(int(res.Nmensajes)) + "\n")
+		for i := 0; i < int(res.Nmensajes); i++ {
+			fmt.Printf(res.Mensajes[i].Data + "\n")
 		}
-		if res.Ack == "OK" {
-			connS.Close()
-		}*/
+
+	}
+	connS.Close()
 
 }
 
 func main() {
-	go retrieve_content("MILITAR", 1, "LLEGADA DE SUMINISTROS A DEPOSITO CITADELA")
+	retrieve_content("MILITAR")
 }

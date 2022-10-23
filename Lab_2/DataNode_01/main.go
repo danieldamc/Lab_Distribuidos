@@ -55,13 +55,14 @@ func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMess
 func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckMessage, error) {
 	defer os.Exit(0)
 	fmt.Println("El Namenode esta cerrando, cerrando Datanode...")
-	err := os.Remove("file.txt")
-	CustomFatal(err)
+	//err := os.Remove("file.txt")
+	//CustomFatal(err)
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
 func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (*pb.ReplyMessage, error) {
-	fp, err := os.Open("test.txt")
+	fmt.Printf("Descarga solicitada: " + msg.Tipo + "\n")
+	fp, err := os.Open("file.txt")
 	if err != nil {
 		return &pb.ReplyMessage{
 			Nmensajes: int64(-1),
@@ -69,7 +70,8 @@ func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (
 	}
 	defer fp.Close()
 	var n int = 0
-	var rep *pb.ReplyMessage
+	//var rep *pb.ReplyMessage
+	rep := &pb.ReplyMessage{Nmensajes: 0}
 	var identificador int
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
@@ -101,6 +103,21 @@ func startCloseService(closeServer *grpc.Server, closeLis net.Listener) {
 	}
 }
 
+func startDownloadService(downloadServer *grpc.Server, downloadLis net.Listener) {
+	pb.RegisterDownloadServiceServer(downloadServer, &downloadserver{})
+	if err := downloadServer.Serve(downloadLis); err != nil {
+		panic("El server no se pudo iniciar" + err.Error())
+	}
+}
+
+/*
+func startUploadService(uploadServer *grpc.Server, uploadLis net.Listener) {
+	pb.RegisterUploadServiceServer(uploadServer, &uploadserver{})
+	if err := uploadServer.Serve(uploadLis); err != nil {
+		panic("El server no se pudo iniciar" + err.Error())
+	}
+}*/
+
 func main() {
 	uploadLis, err := net.Listen("tcp", ":50000")
 	CustomFatal(err)
@@ -115,10 +132,7 @@ func main() {
 
 	go startCloseService(closeServer, closeLis)
 
-	pb.RegisterDownloadServiceServer(downloadServer, &downloadserver{})
-	if err := downloadServer.Serve(downloadLis); err != nil {
-		panic("El server no se pudo iniciar" + err.Error())
-	}
+	go startDownloadService(downloadServer, downloadLis)
 
 	pb.RegisterUploadServiceServer(uploadServer, &uploadserver{})
 	if err := uploadServer.Serve(uploadLis); err != nil {

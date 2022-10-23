@@ -12,13 +12,6 @@ import (
 )
 
 func upload_content(tipo_data string, id int, data string) {
-	fmt.Printf("ENVIANDO...\n")
-	fmt.Printf(tipo_data)
-	fmt.Printf("\n")
-	fmt.Print(id)
-	fmt.Printf("\n")
-	fmt.Printf(data)
-	fmt.Printf("\n")
 	var NameNode_Port string
 	var hostS string
 	NameNode_Port = ":50001"
