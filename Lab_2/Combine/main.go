@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 
-	"math/rand"
-	"time"
-
 	"google.golang.org/grpc"
 
 	pb "github.com/danieldamc/Lab_Distribuidos/Lab_2/Proto"
@@ -20,21 +17,10 @@ var RECIBIDO = "MENSAJE RECIBIDO"
 func upload_content(tipo_data string, id int, data string) {
 	var DataNode_Port string
 	var hostS string
-	var eleccion = rand.Intn(3)
-	if eleccion == 0 {
-		DataNode_Port = ":50000"
-		hostS = "localhost"
-	} else {
-		if eleccion == 1 {
-			DataNode_Port = ":50000"
-			hostS = "localhost"
-		} else {
-			DataNode_Port = ":50000"
-			hostS = "localhost"
-		}
-	}
+	DataNode_Port = ":50001"
+	hostS = "localhost"
 
-	connS, err := grpc.Dial(hostS+DataNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el DataNode
+	connS, err := grpc.Dial(hostS+DataNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el NameNode
 
 	if err != nil {
 		panic("No se pudo conectar con el servidor" + err.Error())
@@ -59,6 +45,5 @@ func upload_content(tipo_data string, id int, data string) {
 }
 
 func main() {
-	rand.Seed(time.Now().Unix())
 	go upload_content("MILITAR", 1, "LLEGADA DE SUMINISTROS A DEPOSITO CITADELA")
 }
