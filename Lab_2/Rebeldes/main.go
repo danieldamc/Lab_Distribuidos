@@ -6,10 +6,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-var Grunt_port string
-var Synth_port string
-var Cremator_port string
-
 var RECIBIDO = "MENSAJE RECIBIDO"
 
 func retrieve_content(tipo_data string, id int, data string) {

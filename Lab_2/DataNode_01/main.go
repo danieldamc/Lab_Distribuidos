@@ -40,6 +40,7 @@ func appendtoFile(tipo string, id int, data string) {
 }
 
 func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
+	fmt.Printf(msg.Tipo + "\n")
 	appendtoFile(msg.Tipo, int(msg.Id), msg.Data)
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
@@ -55,7 +56,7 @@ func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckM
 func main() {
 	uploadLis, err := net.Listen("tcp", ":50000")
 	CustomFatal(err)
-	closeLis, err := net.Listen("tcp", "49000")
+	closeLis, err := net.Listen("tcp", ":49000")
 	CustomFatal(err)
 
 	uploadServer = grpc.NewServer()

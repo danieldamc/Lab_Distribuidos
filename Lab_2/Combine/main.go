@@ -2,17 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"google.golang.org/grpc"
 
 	pb "github.com/danieldamc/Lab_Distribuidos/Lab_2/Proto"
 )
-
-var Grunt_port string
-var Synth_port string
-var Cremator_port string
-
-var RECIBIDO = "MENSAJE RECIBIDO"
 
 func upload_content(tipo_data string, id int, data string) {
 	var NameNode_Port string
@@ -41,9 +37,37 @@ func upload_content(tipo_data string, id int, data string) {
 	if res.Ack == "OK" {
 		connS.Close()
 	}
+	fmt.Printf("Data enviada a NameNode\n")
 
 }
 
 func main() {
-	go upload_content("MILITAR", 1, "LLEGADA DE SUMINISTROS A DEPOSITO CITADELA")
+	var data_type string
+	var data_info string
+	for true {
+		fmt.Printf("ELIGA TIPO DE INFORMACION:\n")
+		fmt.Printf("	1: MILITAR\n")
+		fmt.Printf("	2: FINANCIERO\n")
+		fmt.Printf("	3: LOGISTICO\n")
+		fmt.Printf("	4: SALIR\n")
+
+		fmt.Scanln(&data_type)
+		if data_type == "4" {
+			os.Exit(1)
+		}
+		if data_type == "1" {
+			data_type = "MILITAR"
+		}
+		if data_type == "2" {
+			data_type = "FINANCIERO"
+		}
+		if data_type == "3" {
+			data_type = "LOGISTICO"
+		}
+
+		fmt.Printf("INGRESE DATA DEL MENSAJE\n")
+		fmt.Scanln(&data_info)
+		upload_content(data_type, 1, data_info)
+	}
+
 }

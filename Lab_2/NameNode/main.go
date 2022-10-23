@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net"
 	"os"
 	"os/signal"
 
@@ -18,22 +20,32 @@ var Grunt_port string
 var Synth_port string
 var Cremator_port string
 
+var uploadServer *grpc.Server
+
 var RECIBIDO = "MENSAJE RECIBIDO"
+
+type uploadserver struct {
+	pb.UnimplementedUploadServiceServer
+}
 
 func upload_content(tipo_data string, id int, data string) {
 	var DataNode_Port string
 	var hostS string
 	var eleccion = rand.Intn(3)
+	var local_usado string
 	if eleccion == 0 {
 		DataNode_Port = ":50000"
 		hostS = "localhost"
+		local_usado = "Grunt"
 	} else {
 		if eleccion == 1 {
 			DataNode_Port = ":50000"
 			hostS = "localhost"
+			local_usado = "Cremator"
 		} else {
 			DataNode_Port = ":50000"
 			hostS = "localhost"
+			local_usado = "Synth"
 		}
 	}
 
@@ -58,7 +70,14 @@ func upload_content(tipo_data string, id int, data string) {
 	if res.Ack == "OK" {
 		connS.Close()
 	}
+	fmt.Printf("Mensaje enviado a " + local_usado + " exitosamente.\n")
 
+}
+
+func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
+	fmt.Printf(msg.Tipo + "\n")
+	upload_content(msg.Tipo, int(msg.Id), msg.Data)
+	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
 func main() {
@@ -86,4 +105,14 @@ func main() {
 			ConnClose.Close()
 		}
 	}()
+	uploadLis, err := net.Listen("tcp", ":50001")
+	if err != nil {
+		log.Fatal("Error al escuchar en el puerto 50001")
+	}
+	uploadServer = grpc.NewServer()
+
+	pb.RegisterUploadServiceServer(uploadServer, &uploadserver{})
+	if err := uploadServer.Serve(uploadLis); err != nil {
+		panic("El server no se pudo iniciar" + err.Error())
+	}
 }
