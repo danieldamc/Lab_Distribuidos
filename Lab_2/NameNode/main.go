@@ -89,22 +89,18 @@ func main() {
 	go func() {
 		for sig := range c {
 			print(sig)
-			fmt.Printf("ctrl+c: Iniciando Protocolo de Cierre...\n")
+			fmt.Printf("\nctrl+c: Iniciando Protocolo de Cierre...\n")
 			ConnClose, err := grpc.Dial("localhost:49000", grpc.WithInsecure())
 			if err != nil {
 				panic("No se pudo conectar con el servidor" + err.Error())
 			}
 			ServiceClose := pb.NewCloseServiceClient(ConnClose)
-			res, err := ServiceClose.Close(context.Background(), &pb.CloseMessage{Close: "CLOSE"})
-			if err != nil {
-				panic("No se puede crear el mensaje " + err.Error())
-			}
-			if res.Ack == "OK" {
-				fmt.Println("Se termino la ejecucion del Datanode")
-			}
+			ServiceClose.Close(context.Background(), &pb.CloseMessage{Close: "CLOSE"})
 			ConnClose.Close()
+			os.Exit(0)
 		}
 	}()
+
 	uploadLis, err := net.Listen("tcp", ":50001")
 	if err != nil {
 		log.Fatal("Error al escuchar en el puerto 50001")

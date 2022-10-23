@@ -21,6 +21,7 @@ type closeserver struct {
 
 var uploadServer *grpc.Server
 var closeServer *grpc.Server
+var CloseLis net.Listener
 
 func CustomFatal(err error) {
 	if err != nil {
@@ -47,10 +48,17 @@ func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMess
 
 func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckMessage, error) {
 	defer os.Exit(0)
-	fmt.Println("El Namenode esta cerramdo, cerrando Datanode...")
+	fmt.Println("El Namenode esta cerrando, cerrando Datanode...")
 	err := os.Remove("file.txt")
 	CustomFatal(err)
 	return &pb.AckMessage{Ack: "OK"}, nil
+}
+
+func startCloseService(closeServer *grpc.Server, closeLis net.Listener) {
+	pb.RegisterCloseServiceServer(closeServer, &closeserver{})
+	if err := closeServer.Serve(closeLis); err != nil {
+		panic("El server no se pudo iniciar" + err.Error())
+	}
 }
 
 func main() {
@@ -62,13 +70,11 @@ func main() {
 	uploadServer = grpc.NewServer()
 	closeServer = grpc.NewServer()
 
+	go startCloseService(closeServer, closeLis)
+
 	pb.RegisterUploadServiceServer(uploadServer, &uploadserver{})
 	if err := uploadServer.Serve(uploadLis); err != nil {
 		panic("El server no se pudo iniciar" + err.Error())
 	}
 
-	pb.RegisterCloseServiceServer(closeServer, &closeserver{})
-	if err := closeServer.Serve(closeLis); err != nil {
-		panic("El server no se pudo iniciar" + err.Error())
-	}
 }
