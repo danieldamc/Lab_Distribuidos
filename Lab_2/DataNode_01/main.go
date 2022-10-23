@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
 	"net"
 	"os"
 	"strconv"
+	"strings"
 
 	pb "github.com/danieldamc/Lab_Distribuidos/Lab_2/Proto"
 	"google.golang.org/grpc"
@@ -19,9 +21,13 @@ type closeserver struct {
 	pb.UnimplementedCloseServiceServer
 }
 
+type downloadserver struct {
+	pb.UnimplementedDownloadServiceServer
+}
+
 var uploadServer *grpc.Server
 var closeServer *grpc.Server
-var CloseLis net.Listener
+var downloadServer *grpc.Server
 
 func CustomFatal(err error) {
 	if err != nil {
@@ -54,6 +60,40 @@ func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckM
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
+func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (*pb.ReplyMessage, error) {
+	fp, err := os.Open("test.txt")
+	if err != nil {
+		return &pb.ReplyMessage{
+			Nmensajes: int64(-1),
+		}, nil
+	}
+	defer fp.Close()
+	var n int = 0
+	var rep *pb.ReplyMessage
+	var identificador int
+	scanner := bufio.NewScanner(fp)
+	for scanner.Scan() {
+		splitLine := strings.Split(scanner.Text(), ":")
+		if splitLine[0] == msg.Tipo {
+			identificador, err = strconv.Atoi(splitLine[1])
+			CustomFatal(err)
+			rep.Mensajes = append(rep.Mensajes, &pb.Message{
+				Tipo: splitLine[0],
+				Id:   int64(identificador),
+				Data: splitLine[2],
+			})
+			n++
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	rep.Nmensajes = int64(n)
+
+	return rep, nil
+
+}
+
 func startCloseService(closeServer *grpc.Server, closeLis net.Listener) {
 	pb.RegisterCloseServiceServer(closeServer, &closeserver{})
 	if err := closeServer.Serve(closeLis); err != nil {
@@ -66,15 +106,22 @@ func main() {
 	CustomFatal(err)
 	closeLis, err := net.Listen("tcp", ":49000")
 	CustomFatal(err)
+	downloadLis, err := net.Listen("tcp", ":49500")
+	CustomFatal(err)
 
 	uploadServer = grpc.NewServer()
 	closeServer = grpc.NewServer()
+	downloadServer = grpc.NewServer()
 
 	go startCloseService(closeServer, closeLis)
+
+	pb.RegisterDownloadServiceServer(downloadServer, &downloadserver{})
+	if err := downloadServer.Serve(downloadLis); err != nil {
+		panic("El server no se pudo iniciar" + err.Error())
+	}
 
 	pb.RegisterUploadServiceServer(uploadServer, &uploadserver{})
 	if err := uploadServer.Serve(uploadLis); err != nil {
 		panic("El server no se pudo iniciar" + err.Error())
 	}
-
 }
