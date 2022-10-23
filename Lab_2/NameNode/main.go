@@ -40,16 +40,16 @@ func upload_content(tipo_data string, id int, data string) {
 	var local_usado string
 	if eleccion == 0 {
 		DataNode_Port = ":50000"
-		hostS = "localhost"
+		hostS = "dist150"
 		local_usado = "Grunt"
 	} else {
 		if eleccion == 1 {
 			DataNode_Port = ":50000"
-			hostS = "localhost"
+			hostS = "dist151"
 			local_usado = "Cremator"
 		} else {
 			DataNode_Port = ":50000"
-			hostS = "localhost"
+			hostS = "dist152"
 			local_usado = "Synth"
 		}
 	}

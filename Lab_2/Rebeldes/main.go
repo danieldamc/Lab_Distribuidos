@@ -22,7 +22,7 @@ func retrieve_content(query string) {
 	var NameNode_Port string
 	var hostS string
 	NameNode_Port = ":50002"
-	hostS = "localhost"
+	hostS = "dist149"
 
 	connS, err := grpc.Dial(hostS+NameNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el NameNode
 
