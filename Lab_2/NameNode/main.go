@@ -87,7 +87,7 @@ func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMess
 
 func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (*pb.ReplyMessage, error) {
 	fmt.Printf("Descarga solicitada: " + msg.Tipo + "\n")
-	var hostS = "localhost"
+	var hostS = "dist150"
 	var DataNode_Port = ":49500"
 	connS, err := grpc.Dial(hostS+DataNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el DataNode
 
