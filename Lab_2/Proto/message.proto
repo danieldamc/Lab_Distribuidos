@@ -18,11 +18,11 @@ message CloseMessage{
     string close = 1; 
 }
 
-message Request{
+message RequestMessage{
     string tipo = 1;    
 }
 
-message Reply{
+message ReplyMessage{
     int64 nmensajes = 1;
     repeated Message mensajes = 2; 
 }
@@ -36,5 +36,5 @@ service CloseService{
 }
 
 service DownloadService{
-    rpc Download (Request) returns (Reply);
+    rpc Download (RequestMessage) returns (ReplyMessage);
 }
