@@ -14,6 +14,14 @@ message AckMessage{
     string ack = 1;
 }
 
+message CloseMessage{
+    string close = 1; 
+}
+
 service UploadService{
     rpc Upload (Message) returns (AckMessage);
+}
+
+service CloseService{
+    rpc Close (CloseMessage) returns (AckMessage);
 }

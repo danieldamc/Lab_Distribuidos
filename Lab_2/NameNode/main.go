@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"os/signal"
 
 	"math/rand"
 	"time"
@@ -61,4 +64,26 @@ func upload_content(tipo_data string, id int, data string) {
 func main() {
 	rand.Seed(time.Now().Unix())
 	go upload_content("MILITAR", 1, "LLEGADA DE SUMINISTROS A DEPOSITO CITADELA")
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			print(sig)
+			fmt.Printf("ctrl+c: Iniciando Protocolo de Cierre...\n")
+			ConnClose, err := grpc.Dial("localhost:49000", grpc.WithInsecure())
+			if err != nil {
+				panic("No se pudo conectar con el servidor" + err.Error())
+			}
+			ServiceClose := pb.NewCloseServiceClient(ConnClose)
+			res, err := ServiceClose.Close(context.Background(), &pb.CloseMessage{Close: "CLOSE"})
+			if err != nil {
+				panic("No se puede crear el mensaje " + err.Error())
+			}
+			if res.Ack == "OK" {
+				fmt.Println("Se termino la ejecucion del Datanode")
+			}
+			ConnClose.Close()
+		}
+	}()
 }

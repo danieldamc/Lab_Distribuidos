@@ -103,3 +103,89 @@ var UploadService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "Proto/message.proto",
 }
+
+// CloseServiceClient is the client API for CloseService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type CloseServiceClient interface {
+	Close(ctx context.Context, in *CloseMessage, opts ...grpc.CallOption) (*AckMessage, error)
+}
+
+type closeServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewCloseServiceClient(cc grpc.ClientConnInterface) CloseServiceClient {
+	return &closeServiceClient{cc}
+}
+
+func (c *closeServiceClient) Close(ctx context.Context, in *CloseMessage, opts ...grpc.CallOption) (*AckMessage, error) {
+	out := new(AckMessage)
+	err := c.cc.Invoke(ctx, "/grpc.CloseService/Close", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CloseServiceServer is the server API for CloseService service.
+// All implementations must embed UnimplementedCloseServiceServer
+// for forward compatibility
+type CloseServiceServer interface {
+	Close(context.Context, *CloseMessage) (*AckMessage, error)
+	mustEmbedUnimplementedCloseServiceServer()
+}
+
+// UnimplementedCloseServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedCloseServiceServer struct {
+}
+
+func (UnimplementedCloseServiceServer) Close(context.Context, *CloseMessage) (*AckMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Close not implemented")
+}
+func (UnimplementedCloseServiceServer) mustEmbedUnimplementedCloseServiceServer() {}
+
+// UnsafeCloseServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CloseServiceServer will
+// result in compilation errors.
+type UnsafeCloseServiceServer interface {
+	mustEmbedUnimplementedCloseServiceServer()
+}
+
+func RegisterCloseServiceServer(s grpc.ServiceRegistrar, srv CloseServiceServer) {
+	s.RegisterService(&CloseService_ServiceDesc, srv)
+}
+
+func _CloseService_Close_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CloseMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CloseServiceServer).Close(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.CloseService/Close",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CloseServiceServer).Close(ctx, req.(*CloseMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// CloseService_ServiceDesc is the grpc.ServiceDesc for CloseService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var CloseService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "grpc.CloseService",
+	HandlerType: (*CloseServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Close",
+			Handler:    _CloseService_Close_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "Proto/message.proto",
+}
