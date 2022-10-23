@@ -18,10 +18,23 @@ message CloseMessage{
     string close = 1; 
 }
 
+message Request{
+    string tipo = 1;    
+}
+
+message Reply{
+    int64 nmensajes = 1;
+    repeated Message mensajes = 2; 
+}
+
 service UploadService{
     rpc Upload (Message) returns (AckMessage);
 }
 
 service CloseService{
     rpc Close (CloseMessage) returns (AckMessage);
+}
+
+service DownloadService{
+    rpc Download (Request) returns (Reply);
 }
