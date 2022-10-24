@@ -9,13 +9,13 @@ endif
 
 datanode:
 ifeq ($(HOST),dist150)
-	go run DataNode_01/main.go
+	go run DataNode/main.go
 endif
 ifeq ($(HOST),dist151)
-	go run DataNode_01/main.go
+	go run DataNode/main.go
 endif
 ifeq ($(HOST),dist152)
-	go run DataNode_01/main.go
+	go run DataNode/main.go
 else
 	echo "maquina virtual incorrecta para el datanode"
 endif
