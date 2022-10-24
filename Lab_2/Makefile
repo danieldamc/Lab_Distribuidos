@@ -1,23 +1,17 @@
 HOST = $(shell hostname)
 namenode:
 ifeq ($(HOST),dist149)
-	go run NameNode_01/main.go
+	go run NameNode/main.go
 else
 	echo "Maquina virtual incorrecta para el namenode"
 endif
 
 
 datanode:
-ifeq ($(HOST),dist150)
-	go run DataNode/main.go
-endif
-ifeq ($(HOST),dist151)
-	go run DataNode/main.go
-endif
-ifeq ($(HOST),dist152)
-	go run DataNode/main.go
-else
+ifeq ($(HOST),dist149)
 	echo "maquina virtual incorrecta para el datanode"
+else
+	go run DataNode/main.go
 endif
 
 combine:
