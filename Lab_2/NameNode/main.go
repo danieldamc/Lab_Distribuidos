@@ -131,19 +131,23 @@ func startDownloadService(downloadServer *grpc.Server, downloadLis net.Listener)
 func main() {
 	rand.Seed(time.Now().Unix())
 
+	//handle ctrl+c
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		for sig := range c {
+			ip := [3]string{"dist150", "dist151", "dist152"}
 			print(sig)
-			fmt.Printf("\nctrl+c: Iniciando Protocolo de Cierre...\n")
-			ConnClose, err := grpc.Dial("localhost:49000", grpc.WithInsecure())
-			if err != nil {
-				panic("No se pudo conectar con el servidor" + err.Error())
+			fmt.Printf("\nCtrl+c: Iniciando Protocolo de Cierre...\n")
+			for i := 0; i < 3; i++ {
+				ConnClose, err := grpc.Dial(ip[i]+":49000", grpc.WithInsecure())
+				if err != nil {
+					panic("No se pudo conectar con el servidor" + err.Error())
+				}
+				ServiceClose := pb.NewCloseServiceClient(ConnClose)
+				ServiceClose.Close(context.Background(), &pb.CloseMessage{Close: "CLOSE"})
+				ConnClose.Close()
 			}
-			ServiceClose := pb.NewCloseServiceClient(ConnClose)
-			ServiceClose.Close(context.Background(), &pb.CloseMessage{Close: "CLOSE"})
-			ConnClose.Close()
 			os.Exit(0)
 		}
 	}()

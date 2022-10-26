@@ -17,6 +17,7 @@ import (
 type uploadserver struct {
 	pb.UnimplementedUploadServiceServer
 }
+
 type closeserver struct {
 	pb.UnimplementedCloseServiceServer
 }
@@ -109,14 +110,6 @@ func startDownloadService(downloadServer *grpc.Server, downloadLis net.Listener)
 		panic("El server no se pudo iniciar" + err.Error())
 	}
 }
-
-/*
-func startUploadService(uploadServer *grpc.Server, uploadLis net.Listener) {
-	pb.RegisterUploadServiceServer(uploadServer, &uploadserver{})
-	if err := uploadServer.Serve(uploadLis); err != nil {
-		panic("El server no se pudo iniciar" + err.Error())
-	}
-}*/
 
 func main() {
 	uploadLis, err := net.Listen("tcp", ":50000")
