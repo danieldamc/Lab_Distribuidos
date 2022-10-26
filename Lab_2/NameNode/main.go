@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"os/signal"
 
 	"math/rand"
 	"time"
@@ -22,6 +21,7 @@ var Cremator_port string
 
 var uploadServer *grpc.Server
 var downloadServer *grpc.Server
+var CloseServer *grpc.Server
 
 var RECIBIDO = "MENSAJE RECIBIDO"
 
@@ -33,6 +33,10 @@ type downloadserver struct {
 	pb.UnimplementedDownloadServiceServer
 }
 
+type closeserver struct {
+	pb.UnimplementedCloseServiceServer
+}
+
 func upload_content(tipo_data string, id int, data string) {
 	var DataNode_Port string
 	var hostS string
@@ -40,22 +44,21 @@ func upload_content(tipo_data string, id int, data string) {
 	var local_usado string
 	if eleccion == 0 {
 		DataNode_Port = ":50000"
-		hostS = "dist150"
+		hostS = "localhost"
 		local_usado = "Grunt"
 	} else {
 		if eleccion == 1 {
 			DataNode_Port = ":50000"
-			hostS = "dist151"
+			hostS = "localhost"
 			local_usado = "Cremator"
 		} else {
 			DataNode_Port = ":50000"
-			hostS = "dist152"
+			hostS = "localhost"
 			local_usado = "Synth"
 		}
 	}
 
-	connS, err := grpc.Dial(hostS+DataNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el DataNode
-
+	connS, err := grpc.Dial(hostS+DataNode_Port, grpc.WithInsecure())
 	if err != nil {
 		panic("No se pudo conectar con el servidor" + err.Error())
 	}
@@ -79,6 +82,22 @@ func upload_content(tipo_data string, id int, data string) {
 
 }
 
+func closeDataNode(ip string, port string) {
+	ConnClose, err := grpc.Dial(ip+port, grpc.WithInsecure())
+	if err != nil {
+		panic("No se pudo conectar con el servidor" + err.Error())
+	}
+	ServiceClose := pb.NewCloseServiceClient(ConnClose)
+	ServiceClose.Close(context.Background(), &pb.CloseMessage{Close: "1"})
+	ConnClose.Close()
+}
+
+func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckMessage, error) {
+	defer os.Exit(0)
+	closeDataNode("localhost", ":49000")
+	return &pb.AckMessage{Ack: "OK"}, nil
+}
+
 func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
 	fmt.Printf(msg.Tipo + "\n")
 	upload_content(msg.Tipo, int(msg.Id), msg.Data)
@@ -90,11 +109,11 @@ func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (
 	var conecciones [3]string
 	var n_mensajes int
 	var mensajes_totales []*pb.Message
-	conecciones[0] = "dist150:49500"
-	conecciones[1] = "dist151:49500"
-	conecciones[2] = "dist152:49500"
+	conecciones[0] = "localhost:49500"
+	conecciones[1] = "localhost:49500"
+	conecciones[2] = "localhost:49500"
 	for i := 0; i < 3; i++ {
-		connS, err := grpc.Dial(conecciones[i], grpc.WithInsecure()) //crea la conexion sincrona con el DataNode
+		connS, err := grpc.Dial(conecciones[i], grpc.WithInsecure())
 
 		if err != nil {
 			panic("No se pudo conectar con el servidor" + err.Error())
@@ -128,35 +147,23 @@ func startDownloadService(downloadServer *grpc.Server, downloadLis net.Listener)
 	}
 }
 
+func startCloseService(closeServer *grpc.Server, closeLis net.Listener) {
+	pb.RegisterCloseServiceServer(closeServer, &closeserver{})
+	if err := CloseServer.Serve(closeLis); err != nil {
+		panic("El server no se pudo iniciar" + err.Error())
+	}
+}
+
 func main() {
 	rand.Seed(time.Now().Unix())
 
-	//handle ctrl+c
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		for sig := range c {
-			ip := [3]string{"dist150", "dist151", "dist152"}
-			print(sig)
-			fmt.Printf("\nCtrl+c: Iniciando Protocolo de Cierre...\n")
-			for i := 0; i < 3; i++ {
-				ConnClose, err := grpc.Dial(ip[i]+":49000", grpc.WithInsecure())
-				if err != nil {
-					panic("No se pudo conectar con el servidor" + err.Error())
-				}
-				ServiceClose := pb.NewCloseServiceClient(ConnClose)
-				ServiceClose.Close(context.Background(), &pb.CloseMessage{Close: "CLOSE"})
-				ConnClose.Close()
-			}
-			os.Exit(0)
-		}
-	}()
-
 	uploadLis, err := net.Listen("tcp", ":50001")
 	downloadLis, err2 := net.Listen("tcp", ":50002")
+	closeLis, err3 := net.Listen("tcp", ":49001")
 
 	uploadServer = grpc.NewServer()
 	downloadServer = grpc.NewServer()
+	CloseServer = grpc.NewServer()
 
 	if err != nil {
 		log.Fatal("Error al escuchar en el puerto 50001")
@@ -166,7 +173,12 @@ func main() {
 		log.Fatal("Error al escuchar en el puerto 50002")
 	}
 
+	if err3 != nil {
+		log.Fatal("Error al escuchar en el puerto 49001")
+	}
+
 	go startDownloadService(downloadServer, downloadLis)
+	go startCloseService(CloseServer, closeLis)
 
 	pb.RegisterUploadServiceServer(uploadServer, &uploadserver{})
 	if err := uploadServer.Serve(uploadLis); err != nil {

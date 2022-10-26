@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 
 	"google.golang.org/grpc"
@@ -22,7 +24,7 @@ func retrieve_content(query string) {
 	var NameNode_Port string
 	var hostS string
 	NameNode_Port = ":50002"
-	hostS = "dist149"
+	hostS = "localhost"
 
 	connS, err := grpc.Dial(hostS+NameNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el NameNode
 
@@ -50,9 +52,47 @@ func retrieve_content(query string) {
 
 	}
 	connS.Close()
+}
 
+func Close() {
+	var CloseHost string = "localhost"
+	var ClosePort string = ":49001"
+
+	CloseConn, err := grpc.Dial(CloseHost+ClosePort, grpc.WithInsecure())
+	if err != nil {
+		panic("No se pudo conectar con el servidor" + err.Error())
+	}
+
+	CloseService := pb.NewCloseServiceClient(CloseConn)
+
+	CloseService.Close(context.Background(), &pb.CloseMessage{Close: "1"})
+	CloseConn.Close()
 }
 
 func main() {
-	retrieve_content("MILITAR")
+	var menu string = "Eliga la accion a realizar:\n\t1:Obtener Informacion Militar\n\t2:Obtener Informacion Financiera\n\t3:Obtener Informacion Logistica\n\t4:Cerrar NameNode y Datanodes\n\tEleccion: "
+	var election string
+
+	for {
+		fmt.Print(menu)
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			election = scanner.Text()
+		}
+		switch election {
+		case "1":
+			fmt.Println("\nObteniendo informacion militar... ")
+		case "2":
+			fmt.Println("\nObteniendo informacion financiera...")
+		case "3":
+			fmt.Println("\nObteniendo informacion logistica...")
+		case "4":
+			fmt.Println("\nIniciando proceso de cierre del Namenode y Datanodes...")
+			Close()
+			fmt.Println("Se han cerrado el Namenode y los Datanodes")
+			os.Exit(0)
+		default:
+			fmt.Println("\nEleccion incorrecta")
+		}
+	}
 }
