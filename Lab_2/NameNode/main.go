@@ -87,27 +87,38 @@ func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMess
 
 func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (*pb.ReplyMessage, error) {
 	fmt.Printf("Descarga solicitada: " + msg.Tipo + "\n")
-	var hostS = "dist150"
-	var DataNode_Port = ":49500"
-	connS, err := grpc.Dial(hostS+DataNode_Port, grpc.WithInsecure()) //crea la conexion sincrona con el DataNode
+	var conecciones [3]string
+	var n_mensajes int
+	var mensajes_totales []*pb.Message
+	conecciones[0] = "dist150:49500"
+	conecciones[1] = "dist151:49500"
+	conecciones[2] = "dist152:49500"
+	for i := 0; i < 3; i++ {
+		connS, err := grpc.Dial(conecciones[i], grpc.WithInsecure()) //crea la conexion sincrona con el DataNode
 
-	if err != nil {
-		panic("No se pudo conectar con el servidor" + err.Error())
+		if err != nil {
+			panic("No se pudo conectar con el servidor" + err.Error())
+		}
+
+		service := pb.NewDownloadServiceClient(connS)
+
+		res, err := service.Download(context.Background(),
+			&pb.RequestMessage{
+				Tipo: msg.Tipo,
+			})
+
+		if err != nil {
+			panic("No se puede crear el mensaje " + err.Error())
+		}
+		fmt.Printf("Mensaje enviado exitosamente.\n")
+		n_mensajes += int(res.Nmensajes)
+		for j := 0; j < int(res.Nmensajes); j++ {
+			mensajes_totales = append(mensajes_totales, res.Mensajes[j])
+		}
+
 	}
 
-	service := pb.NewDownloadServiceClient(connS)
-
-	res, err := service.Download(context.Background(),
-		&pb.RequestMessage{
-			Tipo: msg.Tipo,
-		})
-
-	if err != nil {
-		panic("No se puede crear el mensaje " + err.Error())
-	}
-	fmt.Printf("Mensaje enviado exitosamente.\n")
-
-	return &pb.ReplyMessage{Nmensajes: res.Nmensajes, Mensajes: res.Mensajes}, nil
+	return &pb.ReplyMessage{Nmensajes: int64(n_mensajes), Mensajes: mensajes_totales}, nil
 }
 
 func startDownloadService(downloadServer *grpc.Server, downloadLis net.Listener) {
