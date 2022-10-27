@@ -61,8 +61,8 @@ func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckM
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
-func (s *fetchserver) Download(ctx context.Context, msg *pb.RequestToDataNodeMessage) (*pb.ReplyToNameNodeMessage, error) {
-	fmt.Printf("Descarga solicitada: "+msg.Tipo+"\n", msg.Id)
+func (s *fetchserver) Fetch(ctx context.Context, msg *pb.RequestToDataNodeMessage) (*pb.ReplyToNameNodeMessage, error) {
+	fmt.Printf("Descarga solicitada: " + msg.Tipo + " " + msg.Id + "\n")
 	fp, err := os.Open("DATA.txt")
 	if err != nil {
 		return &pb.ReplyToNameNodeMessage{Si: "0"}, nil

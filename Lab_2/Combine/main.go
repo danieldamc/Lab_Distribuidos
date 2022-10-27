@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 
 	"google.golang.org/grpc"
 
@@ -73,7 +74,16 @@ func main() {
 		if scanner.Scan() {
 			data_info = scanner.Text()
 		}
-		upload_content(data_type, 1, data_info)
+		fmt.Printf("INGRESE ID DEL MENSAJE\n")
+		if scanner.Scan() {
+			id, err := strconv.Atoi(scanner.Text())
+			if err != nil {
+				os.Exit(47)
+			}
+			upload_content(data_type, id, data_info)
+		}
+
+		//upload_content(data_type, id, data_info)
 	}
 
 }

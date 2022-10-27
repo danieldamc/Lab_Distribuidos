@@ -82,10 +82,13 @@ func main() {
 		switch election {
 		case "1":
 			fmt.Println("\nObteniendo informacion militar... ")
+			retrieve_content("MILITAR")
 		case "2":
 			fmt.Println("\nObteniendo informacion financiera...")
+			retrieve_content("FINANCIERO")
 		case "3":
 			fmt.Println("\nObteniendo informacion logistica...")
+			retrieve_content("LOGISTICO")
 		case "4":
 			fmt.Println("\nIniciando proceso de cierre del Namenode y Datanodes...")
 			Close()

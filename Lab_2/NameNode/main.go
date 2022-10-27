@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
 	"net"
 	"os"
+	"strconv"
+	"strings"
 
 	"math/rand"
 	"time"
@@ -35,6 +38,21 @@ type downloadserver struct {
 
 type closeserver struct {
 	pb.UnimplementedCloseServiceServer
+}
+
+type fetchserver struct {
+	pb.UnimplementedFetchServiceServer
+}
+
+func appendtoFile(id int, nombre_datanode string) {
+	file, err := os.OpenFile("DATA.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		log.Println(err)
+	}
+	defer file.Close()
+	if _, err := file.WriteString(strconv.Itoa(id) + ":" + nombre_datanode + "\n"); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func upload_content(tipo_data string, id int, data string) {
@@ -79,6 +97,7 @@ func upload_content(tipo_data string, id int, data string) {
 		connS.Close()
 	}
 	fmt.Printf("Mensaje enviado a " + local_usado + " exitosamente.\n")
+	appendtoFile(id, local_usado)
 
 }
 
@@ -100,42 +119,79 @@ func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckM
 
 func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
 	fmt.Printf(msg.Tipo + "\n")
+
 	upload_content(msg.Tipo, int(msg.Id), msg.Data)
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
 func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (*pb.ReplyMessage, error) {
 	fmt.Printf("Descarga solicitada: " + msg.Tipo + "\n")
-	var conecciones [3]string
-	var n_mensajes int
+	var n_mensajes int = 0
 	var mensajes_totales []*pb.Message
-	conecciones[0] = "localhost:49500"
-	conecciones[1] = "localhost:49500"
-	conecciones[2] = "localhost:49500"
-	for i := 0; i < 3; i++ {
-		connS, err := grpc.Dial(conecciones[i], grpc.WithInsecure())
+	mapa_conecciones := map[string]string{"Grunt": "localhost:49500", "Synth": "localhost:49500", "Cremator": "localhost:49500"}
+
+	readFile, err := os.Open("DATA.txt")
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	fileScanner := bufio.NewScanner(readFile)
+
+	for fileScanner.Scan() {
+		splitLine := strings.Split(fileScanner.Text(), ":")
+		id := splitLine[0]
+		root := splitLine[1]
+
+		connS, err := grpc.Dial(mapa_conecciones[root], grpc.WithInsecure())
 
 		if err != nil {
 			panic("No se pudo conectar con el servidor" + err.Error())
 		}
+		service := pb.NewFetchServiceClient(connS)
 
-		service := pb.NewDownloadServiceClient(connS)
-
-		res, err := service.Download(context.Background(),
-			&pb.RequestMessage{
+		res, err := service.Fetch(context.Background(),
+			&pb.RequestToDataNodeMessage{
 				Tipo: msg.Tipo,
+				Id:   id,
 			})
 
 		if err != nil {
 			panic("No se puede crear el mensaje " + err.Error())
 		}
-		fmt.Printf("Mensaje enviado exitosamente.\n")
-		n_mensajes += int(res.Nmensajes)
-		for j := 0; j < int(res.Nmensajes); j++ {
-			mensajes_totales = append(mensajes_totales, res.Mensajes[j])
+		if res.Si == "1" {
+			n_mensajes++
+			mensajes_totales = append(mensajes_totales, res.Mensaje)
 		}
 
 	}
+
+	readFile.Close()
+
+	/*
+		for i := 0; i < 3; i++ {
+			connS, err := grpc.Dial(conecciones[i], grpc.WithInsecure())
+
+			if err != nil {
+				panic("No se pudo conectar con el servidor" + err.Error())
+			}
+
+			service := pb.NewDownloadServiceClient(connS)
+
+			res, err := service.Download(context.Background(),
+				&pb.RequestMessage{
+					Tipo: msg.Tipo,
+				})
+
+			if err != nil {
+				panic("No se puede crear el mensaje " + err.Error())
+			}
+			fmt.Printf("Mensaje enviado exitosamente.\n")
+			n_mensajes += int(res.Nmensajes)
+			for j := 0; j < int(res.Nmensajes); j++ {
+				mensajes_totales = append(mensajes_totales, res.Mensajes[j])
+			}
+
+		}*/
 
 	return &pb.ReplyMessage{Nmensajes: int64(n_mensajes), Mensajes: mensajes_totales}, nil
 }
