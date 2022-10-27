@@ -10,6 +10,16 @@ message Message {
     string data = 3;
 }
 
+message RequestToDataNodeMessage{
+    string tipo = 1;
+    string id = 2;
+}
+
+message ReplyToNameNodeMessage{
+    string si = 1;
+    Message mensaje = 2;
+}
+
 message AckMessage{
     string ack = 1;
 }
@@ -37,4 +47,8 @@ service CloseService{
 
 service DownloadService{
     rpc Download (RequestMessage) returns (ReplyMessage);
+}
+
+service FetchService{
+    rpc Fetch (RequestToDataNodeMessage) returns (ReplyToNameNodeMessage);
 }
