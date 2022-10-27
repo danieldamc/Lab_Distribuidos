@@ -22,13 +22,13 @@ type closeserver struct {
 	pb.UnimplementedCloseServiceServer
 }
 
-type downloadserver struct {
-	pb.UnimplementedDownloadServiceServer
+type fetchserver struct {
+	pb.UnimplementedFetchServiceServer
 }
 
 var uploadServer *grpc.Server
 var closeServer *grpc.Server
-var downloadServer *grpc.Server
+var fetchServer *grpc.Server
 
 func CustomFatal(err error) {
 	if err != nil {
@@ -37,7 +37,7 @@ func CustomFatal(err error) {
 }
 
 func appendtoFile(tipo string, id int, data string) {
-	file, err := os.OpenFile("file.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	file, err := os.OpenFile("DATA.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		log.Println(err)
 	}
@@ -61,40 +61,26 @@ func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckM
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
-func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (*pb.ReplyMessage, error) {
-	fmt.Printf("Descarga solicitada: " + msg.Tipo + "\n")
-	fp, err := os.Open("file.txt")
+func (s *fetchserver) Download(ctx context.Context, msg *pb.RequestToDataNodeMessage) (*pb.ReplyToNameNodeMessage, error) {
+	fmt.Printf("Descarga solicitada: "+msg.Tipo+"\n", msg.Id)
+	fp, err := os.Open("DATA.txt")
 	if err != nil {
-		return &pb.ReplyMessage{
-			Nmensajes: int64(-1),
-		}, nil
+		return &pb.ReplyToNameNodeMessage{Si: "0"}, nil
 	}
 	defer fp.Close()
-	var n int = 0
-	//var rep *pb.ReplyMessage
-	rep := &pb.ReplyMessage{Nmensajes: 0}
-	var identificador int
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
 		splitLine := strings.Split(scanner.Text(), ":")
-		if splitLine[0] == msg.Tipo {
-			identificador, err = strconv.Atoi(splitLine[1])
+		if splitLine[0] == msg.Tipo && splitLine[1] == msg.Id {
+			identificador, err := strconv.Atoi(splitLine[1])
 			CustomFatal(err)
-			rep.Mensajes = append(rep.Mensajes, &pb.Message{
-				Tipo: splitLine[0],
-				Id:   int64(identificador),
-				Data: splitLine[2],
-			})
-			n++
+			return &pb.ReplyToNameNodeMessage{Si: "1", Mensaje: &pb.Message{Tipo: msg.Tipo, Id: int64(identificador), Data: splitLine[2]}}, nil
 		}
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	rep.Nmensajes = int64(n)
-
-	return rep, nil
-
+	return &pb.ReplyToNameNodeMessage{Si: "0"}, nil
 }
 
 func startCloseService(closeServer *grpc.Server, closeLis net.Listener) {
@@ -104,9 +90,9 @@ func startCloseService(closeServer *grpc.Server, closeLis net.Listener) {
 	}
 }
 
-func startDownloadService(downloadServer *grpc.Server, downloadLis net.Listener) {
-	pb.RegisterDownloadServiceServer(downloadServer, &downloadserver{})
-	if err := downloadServer.Serve(downloadLis); err != nil {
+func startFetchService(fetchServer *grpc.Server, fetchLis net.Listener) {
+	pb.RegisterFetchServiceServer(fetchServer, &fetchserver{})
+	if err := fetchServer.Serve(fetchLis); err != nil {
 		panic("El server no se pudo iniciar" + err.Error())
 	}
 }
@@ -116,16 +102,16 @@ func main() {
 	CustomFatal(err)
 	closeLis, err := net.Listen("tcp", ":49000")
 	CustomFatal(err)
-	downloadLis, err := net.Listen("tcp", ":49500")
+	fetchLis, err := net.Listen("tcp", ":49500")
 	CustomFatal(err)
 
 	uploadServer = grpc.NewServer()
 	closeServer = grpc.NewServer()
-	downloadServer = grpc.NewServer()
+	fetchServer = grpc.NewServer()
 
 	go startCloseService(closeServer, closeLis)
 
-	go startDownloadService(downloadServer, downloadLis)
+	go startFetchService(fetchServer, fetchLis)
 
 	pb.RegisterUploadServiceServer(uploadServer, &uploadserver{})
 	if err := uploadServer.Serve(uploadLis); err != nil {
