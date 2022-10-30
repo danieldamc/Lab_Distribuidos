@@ -61,16 +61,16 @@ func upload_content(tipo_data string, id int, data string) {
 	var eleccion = rand.Intn(3)
 	var local_usado string
 	if eleccion == 0 {
-		DataNode_Port = ":50000"
+		DataNode_Port = "dist150:50000"
 		hostS = "localhost"
 		local_usado = "Grunt"
 	} else {
 		if eleccion == 1 {
-			DataNode_Port = ":50000"
+			DataNode_Port = "dist152:50000"
 			hostS = "localhost"
 			local_usado = "Cremator"
 		} else {
-			DataNode_Port = ":50000"
+			DataNode_Port = "dist151:50000"
 			hostS = "localhost"
 			local_usado = "Synth"
 		}
@@ -128,7 +128,7 @@ func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (
 	fmt.Printf("Descarga solicitada: " + msg.Tipo + "\n")
 	var n_mensajes int = 0
 	var mensajes_totales []*pb.Message
-	mapa_conecciones := map[string]string{"Grunt": "localhost:49500", "Synth": "localhost:49500", "Cremator": "localhost:49500"}
+	mapa_conecciones := map[string]string{"Grunt": "dist150:49500", "Synth": "dist151:49500", "Cremator": "dist152:49500"}
 
 	readFile, err := os.Open("DATA.txt")
 
