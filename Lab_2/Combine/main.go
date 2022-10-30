@@ -70,11 +70,11 @@ func main() {
 			data_type = "LOGISTICO"
 		}
 
-		fmt.Printf("INGRESE DATA DEL MENSAJE\n")
+		fmt.Print("INGRESE DATA DEL MENSAJE: ")
 		if scanner.Scan() {
 			data_info = scanner.Text()
 		}
-		fmt.Printf("INGRESE ID DEL MENSAJE\n")
+		fmt.Print("INGRESE ID DEL MENSAJE: ")
 		if scanner.Scan() {
 			id, err := strconv.Atoi(scanner.Text())
 			if err != nil {

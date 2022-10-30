@@ -56,8 +56,8 @@ func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMess
 func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckMessage, error) {
 	defer os.Exit(0)
 	fmt.Println("El Namenode esta cerrando, cerrando Datanode...")
-	//err := os.Remove("file.txt")
-	//CustomFatal(err)
+	err := os.Remove("DATA.txt")
+	CustomFatal(err)
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
@@ -65,6 +65,7 @@ func (s *fetchserver) Fetch(ctx context.Context, msg *pb.RequestToDataNodeMessag
 	fmt.Printf("Descarga solicitada: " + msg.Tipo + " " + msg.Id + "\n")
 	fp, err := os.Open("DATA.txt")
 	if err != nil {
+		fmt.Println("Mensaje enviado: 0")
 		return &pb.ReplyToNameNodeMessage{Si: "0"}, nil
 	}
 	defer fp.Close()
@@ -74,12 +75,14 @@ func (s *fetchserver) Fetch(ctx context.Context, msg *pb.RequestToDataNodeMessag
 		if splitLine[0] == msg.Tipo && splitLine[1] == msg.Id {
 			identificador, err := strconv.Atoi(splitLine[1])
 			CustomFatal(err)
+			fmt.Println("Mensaje enviado; Tipo: " + msg.Tipo + "; Id: " + strconv.Itoa(identificador) + "; Data: " + splitLine[2])
 			return &pb.ReplyToNameNodeMessage{Si: "1", Mensaje: &pb.Message{Tipo: msg.Tipo, Id: int64(identificador), Data: splitLine[2]}}, nil
 		}
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Mensaje enviado: 0")
 	return &pb.ReplyToNameNodeMessage{Si: "0"}, nil
 }
 

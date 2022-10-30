@@ -44,6 +44,12 @@ type fetchserver struct {
 	pb.UnimplementedFetchServiceServer
 }
 
+func CustomFatal(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func appendtoFile(id int, nombre_datanode string) {
 	file, err := os.OpenFile("DATA.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
@@ -113,9 +119,16 @@ func closeDataNode(ip string, port string) {
 
 func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckMessage, error) {
 	defer os.Exit(0)
+	fmt.Println("Se ha iniciado el protocolo de cierre...")
 	closeDataNode("dist150", ":49000")
+	fmt.Println("Se ha cerrado DataNode")
 	closeDataNode("dist151", ":49000")
+	fmt.Println("Se ha cerrado DataNode")
 	closeDataNode("dist152", ":49000")
+	fmt.Println("Se ha cerrado DataNode")
+	fmt.Println("Cerrando NameNode...")
+	err := os.Remove("DATA.txt")
+	CustomFatal(err)
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
