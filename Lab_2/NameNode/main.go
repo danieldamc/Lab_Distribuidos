@@ -62,6 +62,7 @@ func appendtoFile(id int, nombre_datanode string) {
 }
 
 func upload_content(tipo_data string, id int, data string) {
+
 	var DataNode_Port string
 	var hostS string
 	var eleccion = rand.Intn(3)
@@ -134,6 +135,22 @@ func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckM
 
 func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
 	//fmt.Printf(msg.Tipo + "\n")
+	fp, err := os.Open("DATA.txt")
+	if err != nil {
+		fmt.Println("Archivo txt no encontrado")
+	} else {
+		defer fp.Close()
+		scanner := bufio.NewScanner(fp)
+		for scanner.Scan() {
+			splitLine := strings.Split(scanner.Text(), ":")
+			if splitLine[0] == strconv.Itoa(int(msg.Id)) {
+				return &pb.AckMessage{Ack: "NO"}, nil
+			}
+		}
+		if err := scanner.Err(); err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	upload_content(msg.Tipo, int(msg.Id), msg.Data)
 	return &pb.AckMessage{Ack: "OK"}, nil

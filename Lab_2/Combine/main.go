@@ -36,10 +36,13 @@ func upload_content(tipo_data string, id int, data string) {
 	if err != nil {
 		panic("No se puede crear el mensaje " + err.Error())
 	}
-	if res.Ack == "OK" {
-		connS.Close()
+	if res.Ack == "NO" {
+		fmt.Printf("ID REPETIDO, ERROR AL INTENTAR SUBIR MENSAJE\n")
 	}
-	fmt.Printf("Data enviada a NameNode\n")
+	if res.Ack == "OK" {
+		fmt.Printf("Data enviada a NameNode\n")
+	}
+	connS.Close()
 
 }
 
