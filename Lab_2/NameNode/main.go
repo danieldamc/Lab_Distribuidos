@@ -138,17 +138,18 @@ func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMess
 	fp, err := os.Open("DATA.txt")
 	if err != nil {
 		fmt.Println("Archivo txt no encontrado")
-	}
-	defer fp.Close()
-	scanner := bufio.NewScanner(fp)
-	for scanner.Scan() {
-		splitLine := strings.Split(scanner.Text(), ":")
-		if splitLine[0] == strconv.Itoa(int(msg.Id)) {
-			return &pb.AckMessage{Ack: "NO"}, nil
+	} else {
+		defer fp.Close()
+		scanner := bufio.NewScanner(fp)
+		for scanner.Scan() {
+			splitLine := strings.Split(scanner.Text(), ":")
+			if splitLine[0] == strconv.Itoa(int(msg.Id)) {
+				return &pb.AckMessage{Ack: "NO"}, nil
+			}
 		}
-	}
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		if err := scanner.Err(); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	upload_content(msg.Tipo, int(msg.Id), msg.Data)
