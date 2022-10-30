@@ -55,8 +55,8 @@ func retrieve_content(query string) {
 }
 
 func Close() {
-	var CloseHost string = "localhost"
-	var ClosePort string = ":49001"
+	var CloseHost string = "dist149"
+	var ClosePort string = ":49000"
 
 	CloseConn, err := grpc.Dial(CloseHost+ClosePort, grpc.WithInsecure())
 	if err != nil {

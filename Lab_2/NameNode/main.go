@@ -113,7 +113,9 @@ func closeDataNode(ip string, port string) {
 
 func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckMessage, error) {
 	defer os.Exit(0)
-	closeDataNode("localhost", ":49000")
+	closeDataNode("dist150", ":49000")
+	closeDataNode("dist151", ":49000")
+	closeDataNode("dist152", ":49000")
 	return &pb.AckMessage{Ack: "OK"}, nil
 }
 
@@ -215,7 +217,7 @@ func main() {
 
 	uploadLis, err := net.Listen("tcp", ":50001")
 	downloadLis, err2 := net.Listen("tcp", ":50002")
-	closeLis, err3 := net.Listen("tcp", ":49001")
+	closeLis, err3 := net.Listen("tcp", ":49000")
 
 	uploadServer = grpc.NewServer()
 	downloadServer = grpc.NewServer()
@@ -230,7 +232,7 @@ func main() {
 	}
 
 	if err3 != nil {
-		log.Fatal("Error al escuchar en el puerto 49001")
+		log.Fatal("Error al escuchar en el puerto 49000")
 	}
 
 	go startDownloadService(downloadServer, downloadLis)
