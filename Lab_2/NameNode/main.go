@@ -96,7 +96,7 @@ func upload_content(tipo_data string, id int, data string) {
 	if res.Ack == "OK" {
 		connS.Close()
 	}
-	fmt.Printf("Mensaje enviado a " + local_usado + " exitosamente.\n")
+	fmt.Printf("Mensaje de tipo " + tipo_data + " enviado a " + local_usado + " exitosamente.\n")
 	appendtoFile(id, local_usado)
 
 }
@@ -120,7 +120,7 @@ func (s *closeserver) Close(ctx context.Context, msg *pb.CloseMessage) (*pb.AckM
 }
 
 func (s *uploadserver) Upload(ctx context.Context, msg *pb.Message) (*pb.AckMessage, error) {
-	fmt.Printf(msg.Tipo + "\n")
+	//fmt.Printf(msg.Tipo + "\n")
 
 	upload_content(msg.Tipo, int(msg.Id), msg.Data)
 	return &pb.AckMessage{Ack: "OK"}, nil
@@ -168,32 +168,6 @@ func (s *downloadserver) Download(ctx context.Context, msg *pb.RequestMessage) (
 	}
 
 	readFile.Close()
-
-	/*
-		for i := 0; i < 3; i++ {
-			connS, err := grpc.Dial(conecciones[i], grpc.WithInsecure())
-
-			if err != nil {
-				panic("No se pudo conectar con el servidor" + err.Error())
-			}
-
-			service := pb.NewDownloadServiceClient(connS)
-
-			res, err := service.Download(context.Background(),
-				&pb.RequestMessage{
-					Tipo: msg.Tipo,
-				})
-
-			if err != nil {
-				panic("No se puede crear el mensaje " + err.Error())
-			}
-			fmt.Printf("Mensaje enviado exitosamente.\n")
-			n_mensajes += int(res.Nmensajes)
-			for j := 0; j < int(res.Nmensajes); j++ {
-				mensajes_totales = append(mensajes_totales, res.Mensajes[j])
-			}
-
-		}*/
 
 	return &pb.ReplyMessage{Nmensajes: int64(n_mensajes), Mensajes: mensajes_totales}, nil
 }
