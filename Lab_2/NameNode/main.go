@@ -61,17 +61,17 @@ func upload_content(tipo_data string, id int, data string) {
 	var eleccion = rand.Intn(3)
 	var local_usado string
 	if eleccion == 0 {
-		DataNode_Port = "dist150:50000"
-		hostS = "localhost"
+		DataNode_Port = ":50000"
+		hostS = "dist150"
 		local_usado = "Grunt"
 	} else {
 		if eleccion == 1 {
-			DataNode_Port = "dist152:50000"
-			hostS = "localhost"
+			DataNode_Port = ":50000"
+			hostS = "dist152"
 			local_usado = "Cremator"
 		} else {
-			DataNode_Port = "dist151:50000"
-			hostS = "localhost"
+			DataNode_Port = ":50000"
+			hostS = "dist151"
 			local_usado = "Synth"
 		}
 	}
