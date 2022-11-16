@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "SD/LAB1/proto";
+
+message Message {
+    string data = 1;
+}
