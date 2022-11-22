@@ -4,6 +4,34 @@ package grpc;
 
 option go_package = "SD/LAB1/proto";
 
-message Message {
-    string data = 1;
+message BaseMessage{
+    string sector = 1;
+    string base = 2;
+    string valor = 3;
+}
+
+message RenameMessage{
+    string sector = 1;
+    string base = 2;
+    string newbase = 3;
+}
+
+message QueryMessage{
+    string sector = 1;
+    string base = 2;
+}
+
+message ReplyMessage{
+    string valor = 1; 
+}
+
+service PlanetaryService{
+    rpc Add (BaseMessage) returns (ReplyMessage);
+    rpc Rename (RenameMessage) returns (ReplyMessage);
+    rpc Update (BaseMessage) returns (ReplyMessage);
+    rpc Delete (BaseMessage) returns (ReplyMessage);
+}
+
+service GetService{
+    rpc Get (QueryMessage) returns (ReplyMessage);
 }
