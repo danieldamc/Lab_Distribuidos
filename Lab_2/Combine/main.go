@@ -61,7 +61,7 @@ func main() {
 			data_type = scanner.Text()
 		}
 		if data_type == "4" {
-			os.Exit(1)
+			os.Exit(0)
 		}
 		if data_type == "1" {
 			data_type = "MILITAR"
@@ -81,7 +81,7 @@ func main() {
 		if scanner.Scan() {
 			id, err := strconv.Atoi(scanner.Text())
 			if err != nil {
-				os.Exit(47)
+				os.Exit(0)
 			}
 			upload_content(data_type, id, data_info)
 		}
