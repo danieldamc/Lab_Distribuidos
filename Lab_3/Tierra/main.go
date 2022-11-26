@@ -52,8 +52,9 @@ func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*p
 	fp.Close()
 
 	for i, line := range lines {
-		if strings.Contains(line, msg.Base) {
-			lines[i] = msg.Sector + " " + msg.Newbase + " " + strings.Split(line, " ")[2]
+		words := strings.Split(line, " ")
+		if words[1] == msg.Base {
+			lines[i] = msg.Sector + " " + msg.Newbase + " " + words[2]
 		}
 	}
 
@@ -80,7 +81,8 @@ func (s *planetaryserver) Update(ctx context.Context, msg *pb.BaseMessage) (*pb.
 	fp.Close()
 
 	for i, line := range lines {
-		if strings.Contains(line, msg.Sector) {
+		words := strings.Split(line, " ")
+		if words[1] == msg.Base {
 			lines[i] = msg.Sector + " " + msg.Base + " " + msg.Valor
 		}
 	}
@@ -108,7 +110,8 @@ func (s *planetaryserver) Delete(ctx context.Context, msg *pb.BaseMessage) (*pb.
 	fp.Close()
 
 	for i, line := range lines {
-		if strings.Contains(line, msg.Sector) {
+		words := strings.Split(line, " ")
+		if words[1] == msg.Base {
 			lines[i] = " "
 		}
 	}
