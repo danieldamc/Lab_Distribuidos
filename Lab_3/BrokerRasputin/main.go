@@ -131,7 +131,7 @@ func (s *getserver) Get(ctx context.Context, msg *pb.QueryMessage) (*pb.ReplyMes
 }
 
 func (s *planetaryserver) Add(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
-	mapa_conecciones := map[string]string{"Tierra": "dist150:49500", "Titan": "dist151:49500", "Marte": "dist152:49500"}
+	mapa_conecciones := map[string]string{"Tierra": "dist150:49000", "Titan": "dist151:49000", "Marte": "dist152:49000"}
 
 	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 
@@ -155,7 +155,7 @@ func (s *planetaryserver) Add(ctx context.Context, msg *pb.BaseMessage) (*pb.Rep
 }
 
 func (s *planetaryserver) Update(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
-	mapa_conecciones := map[string]string{"Tierra": "dist150:49500", "Titan": "dist151:49500", "Marte": "dist152:49500"}
+	mapa_conecciones := map[string]string{"Tierra": "dist150:49000", "Titan": "dist151:49000", "Marte": "dist152:49000"}
 
 	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 
@@ -179,7 +179,7 @@ func (s *planetaryserver) Update(ctx context.Context, msg *pb.BaseMessage) (*pb.
 }
 
 func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*pb.ReplyMessage, error) {
-	mapa_conecciones := map[string]string{"Tierra": "dist150:49500", "Titan": "dist151:49500", "Marte": "dist152:49500"}
+	mapa_conecciones := map[string]string{"Tierra": "dist150:49000", "Titan": "dist151:49000", "Marte": "dist152:49000"}
 
 	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 
@@ -203,7 +203,7 @@ func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*p
 }
 
 func (s *planetaryserver) Delete(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
-	mapa_conecciones := map[string]string{"Tierra": "dist150:49500", "Titan": "dist151:49500", "Marte": "dist152:49500"}
+	mapa_conecciones := map[string]string{"Tierra": "dist150:49000", "Titan": "dist151:49000", "Marte": "dist152:49000"}
 
 	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 
