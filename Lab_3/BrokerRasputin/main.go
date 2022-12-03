@@ -109,28 +109,29 @@ func closeDataNode(ip string, port string) {
 func (s *getserver) Get(ctx context.Context, msg *pb.QueryMessage) (*pb.ReplyMessage, error) {
 	mapa_conecciones := map[string]string{"Tierra": "localhost:49500", "Titan": "localhost:49501", "Marte": "localhost:49502"}
 
-	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
+	/*
+		connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 
-	if err != nil {
-		panic("No se pudo conectar con el servidor" + err.Error())
-	}
-	service := pb.NewGetServiceClient(connS)
+		if err != nil {
+			panic("No se pudo conectar con el servidor" + err.Error())
+		}
+		service := pb.NewGetServiceClient(connS)
 
-	res, err := service.Get(context.Background(),
-		&pb.QueryMessage{
-			Sector: msg.Sector,
-			Base:   msg.Base,
-		})
+		res, err := service.Get(context.Background(),
+			&pb.QueryMessage{
+				Sector: msg.Sector,
+				Base:   msg.Base,
+			})
 
-	if err != nil {
-		panic("No se puede crear el mensaje " + err.Error())
-	}
+		if err != nil {
+			panic("No se puede crear el mensaje " + err.Error())
+		}*/
 
-	return &pb.ReplyMessage{Valor: res.Valor}, nil
+	return &pb.ReplyMessage{Valor: mapa_conecciones["Tierra"]}, nil
 }
 
 func (s *planetaryserver) Add(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
-	mapa_conecciones := map[string]string{"Tierra": "localhost:49500", "Titan": "localhost:49501", "Marte": "localhost:49502"}
+	mapa_conecciones := map[string]string{"Tierra": "localhost:49000", "Titan": "localhost:49001", "Marte": "localhost:49002"}
 
 	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 
@@ -154,7 +155,7 @@ func (s *planetaryserver) Add(ctx context.Context, msg *pb.BaseMessage) (*pb.Rep
 }
 
 func (s *planetaryserver) Update(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
-	mapa_conecciones := map[string]string{"Tierra": "localhost:49500", "Titan": "localhost:49501", "Marte": "localhost:49502"}
+	mapa_conecciones := map[string]string{"Tierra": "localhost:49000", "Titan": "localhost:49001", "Marte": "localhost:49002"}
 
 	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 
@@ -178,7 +179,7 @@ func (s *planetaryserver) Update(ctx context.Context, msg *pb.BaseMessage) (*pb.
 }
 
 func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*pb.ReplyMessage, error) {
-	mapa_conecciones := map[string]string{"Tierra": "localhost:49500", "Titan": "localhost:49501", "Marte": "localhost:49502"}
+	mapa_conecciones := map[string]string{"Tierra": "localhost:49000", "Titan": "localhost:49001", "Marte": "localhost:49002"}
 
 	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 
@@ -202,7 +203,7 @@ func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*p
 }
 
 func (s *planetaryserver) Delete(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
-	mapa_conecciones := map[string]string{"Tierra": "localhost:49500", "Titan": "localhost:49501", "Marte": "localhost:49502"}
+	mapa_conecciones := map[string]string{"Tierra": "localhost:49000", "Titan": "localhost:49001", "Marte": "localhost:49002"}
 
 	connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
 

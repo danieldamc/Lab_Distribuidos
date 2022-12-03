@@ -12,11 +12,16 @@ import (
 	"google.golang.org/grpc"
 )
 
+type getserver struct {
+	pb.UnimplementedGetServiceServer
+}
+
 type planetaryserver struct {
 	pb.UnimplementedPlanetaryServiceServer
 }
 
 var planetaryServer *grpc.Server
+var GetServer *grpc.Server
 
 func CustomFatal(err error) {
 	if err != nil {
@@ -128,12 +133,27 @@ func (s *planetaryserver) Delete(ctx context.Context, msg *pb.BaseMessage) (*pb.
 	return &pb.ReplyMessage{Valor: "SI"}, nil
 }
 
+func (s *getserver) Get(ctx context.Context, msg *pb.QueryMessage) (*pb.ReplyMessage, error) {
+	//TODO: buscar en los txt numero de soldados de un sector y base
+	return &pb.ReplyMessage{Valor: "1"}, nil
+}
+
+func startGetService(getServer *grpc.Server, getLis net.Listener) {
+	pb.RegisterGetServiceServer(getServer, &getserver{})
+	if err := getServer.Serve(getLis); err != nil {
+		panic("El server no se pudo iniciar" + err.Error())
+	}
+}
+
 func main() {
 	planetaryLis, err := net.Listen("tcp", ":49000")
+	getLis, err := net.Listen("tcp", ":49500")
 	CustomFatal(err)
 
 	planetaryServer = grpc.NewServer()
+	GetServer = grpc.NewServer()
 
+	go startGetService(GetServer, getLis)
 	pb.RegisterPlanetaryServiceServer(planetaryServer, &planetaryserver{})
 	if err := planetaryServer.Serve(planetaryLis); err != nil {
 		panic("El servidor no se pudo iniciar" + err.Error())
