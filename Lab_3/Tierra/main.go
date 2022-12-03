@@ -135,6 +135,22 @@ func (s *planetaryserver) Delete(ctx context.Context, msg *pb.BaseMessage) (*pb.
 
 func (s *getserver) Get(ctx context.Context, msg *pb.QueryMessage) (*pb.ReplyMessage, error) {
 	//TODO: buscar en los txt numero de soldados de un sector y base
+	fp, err := os.Open(msg.Sector + ".txt")
+	CustomFatal(err)
+
+	var lines []string
+	scanner := bufio.NewScanner(fp)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	fp.Close()
+
+	for _, line := range lines {
+		words := strings.Split(line, " ")
+		if words[1] == msg.Base && words[0] == msg.Sector {
+			return &pb.ReplyMessage{Valor: words[2]}, nil
+		}
+	}
 	return &pb.ReplyMessage{Valor: "1"}, nil
 }
 
