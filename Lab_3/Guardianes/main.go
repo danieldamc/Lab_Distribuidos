@@ -16,7 +16,7 @@ func GetSoldados(sector string, base string) {
 	var Rasputin_Port string
 	var hostS string
 	Rasputin_Port = ":49002"
-	hostS = "localhost"
+	hostS = "dist149"
 
 	connS, err := grpc.Dial(hostS+Rasputin_Port, grpc.WithInsecure()) //crea la conexion sincrona con el NameNode
 

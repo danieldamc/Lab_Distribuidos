@@ -16,7 +16,7 @@ func upload_content(sector string, base string, valor string, accion string) {
 	var Rasputin_Port string
 	var hostS string
 	Rasputin_Port = ":50001"
-	hostS = "localhost"
+	hostS = "dist149"
 
 	connS, err := grpc.Dial(hostS+Rasputin_Port, grpc.WithInsecure()) //crea la conexion sincrona con el NameNode
 
