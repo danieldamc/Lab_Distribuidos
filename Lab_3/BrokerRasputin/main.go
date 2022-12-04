@@ -21,7 +21,7 @@ var PlanetaryServer *grpc.Server
 var GetServer *grpc.Server
 
 var RECIBIDO = "MENSAJE RECIBIDO"
-var mapa_conecciones = [3]string{"dist150:50500", "dist151:50500", "dist152:50500"}
+var mapa_conecciones = [3]string{"dist150:60500", "dist151:60500", "dist152:60500"}
 
 type getserver struct {
 	pb.UnimplementedGetServiceServer
