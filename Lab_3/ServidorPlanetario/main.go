@@ -48,7 +48,6 @@ func (s *planetaryserver) Add(ctx context.Context, msg *pb.BaseMessage) (*pb.Rep
 }
 
 func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*pb.ReplyMessage, error) {
-
 	fmt.Println("Rename; " + "Sector: " + msg.Sector + " Base: " + msg.Base + " NewBaseName: " + msg.Newbase)
 
 	fp, err := os.Open(msg.Sector + ".txt")
