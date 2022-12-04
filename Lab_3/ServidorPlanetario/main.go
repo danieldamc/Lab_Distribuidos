@@ -180,8 +180,7 @@ func startGetService(getServer *grpc.Server, getLis net.Listener) {
 }
 
 func main() {
-	planetaryLis, err := net.Listen("tcp", ":49000")
-	CustomFatal(err)
+	planetaryLis, err := net.Listen("tcp", ":49900")
 	getLis, err := net.Listen("tcp", ":60500")
 	CustomFatal(err)
 
