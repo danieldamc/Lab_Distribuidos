@@ -16,4 +16,4 @@ RUN go mod download
 COPY . .
 
 # Export necessary port
-EXPOSE 50001 50002 49000 49500 50000
+EXPOSE 60500 49900 50001 49002
