@@ -49,7 +49,9 @@ func (s *planetaryserver) Add(ctx context.Context, msg *pb.BaseMessage) (*pb.Rep
 
 func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*pb.ReplyMessage, error) {
 	fp, err := os.Open(msg.Sector + ".txt")
-	CustomFatal(err)
+	if err != nil {
+		return &pb.ReplyMessage{Valor: "No Existe"}, nil
+	}
 
 	fmt.Println("Rename; " + "Sector: " + msg.Sector + " Base: " + msg.Base + " NewBaseName: " + msg.Newbase)
 
@@ -80,7 +82,9 @@ func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*p
 
 func (s *planetaryserver) Update(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
 	fp, err := os.Open(msg.Sector + ".txt")
-	CustomFatal(err)
+	if err != nil {
+		return &pb.ReplyMessage{Valor: "No Existe"}, nil
+	}
 
 	fmt.Println("Update; " + "Sector: " + msg.Sector + " Base: " + msg.Base)
 
@@ -113,7 +117,9 @@ func (s *planetaryserver) Delete(ctx context.Context, msg *pb.BaseMessage) (*pb.
 	fmt.Println("Delete; " + "Sector: " + msg.Sector + " Base: " + msg.Base + " nSoldados: " + msg.Valor)
 
 	fp, err := os.Open(msg.Sector + ".txt")
-	CustomFatal(err)
+	if err != nil {
+		return &pb.ReplyMessage{Valor: "No Existe"}, nil
+	}
 
 	var lines []string
 	scanner := bufio.NewScanner(fp)
@@ -144,7 +150,9 @@ func (s *planetaryserver) Delete(ctx context.Context, msg *pb.BaseMessage) (*pb.
 func (s *getserver) Get(ctx context.Context, msg *pb.QueryMessage) (*pb.ReplyMessage, error) {
 	//TODO: buscar en los txt numero de soldados de un sector y base
 	fp, err := os.Open(msg.Sector + ".txt")
-	CustomFatal(err)
+	if err != nil {
+		return &pb.ReplyMessage{Valor: "No Existe"}, nil
+	}
 
 	fmt.Println("Get; " + "Sector: " + msg.Sector + " Base: " + msg.Base)
 
