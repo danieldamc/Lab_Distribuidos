@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -41,6 +42,7 @@ func appendToFile(sector string, base string, nsoldados string) {
 }
 
 func (s *planetaryserver) Add(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
+	fmt.Println("Add; " + "Sector: " + msg.Sector + " Base: " + msg.Base + " nSoldados: " + msg.Valor)
 	appendToFile(msg.Sector, msg.Base, msg.Valor)
 	return &pb.ReplyMessage{Valor: "OK"}, nil
 }
@@ -48,6 +50,8 @@ func (s *planetaryserver) Add(ctx context.Context, msg *pb.BaseMessage) (*pb.Rep
 func (s *planetaryserver) Rename(ctx context.Context, msg *pb.RenameMessage) (*pb.ReplyMessage, error) {
 	fp, err := os.Open(msg.Sector + ".txt")
 	CustomFatal(err)
+
+	fmt.Println("Rename; " + "Sector: " + msg.Sector + " Base: " + msg.Base + " NewBaseName: " + msg.Newbase)
 
 	var lines []string
 	scanner := bufio.NewScanner(fp)
@@ -78,6 +82,8 @@ func (s *planetaryserver) Update(ctx context.Context, msg *pb.BaseMessage) (*pb.
 	fp, err := os.Open(msg.Sector + ".txt")
 	CustomFatal(err)
 
+	fmt.Println("Update; " + "Sector: " + msg.Sector + " Base: " + msg.Base)
+
 	var lines []string
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
@@ -104,6 +110,8 @@ func (s *planetaryserver) Update(ctx context.Context, msg *pb.BaseMessage) (*pb.
 }
 
 func (s *planetaryserver) Delete(ctx context.Context, msg *pb.BaseMessage) (*pb.ReplyMessage, error) {
+	fmt.Println("Delete; " + "Sector: " + msg.Sector + " Base: " + msg.Base + " nSoldados: " + msg.Valor)
+
 	fp, err := os.Open(msg.Sector + ".txt")
 	CustomFatal(err)
 
@@ -137,6 +145,8 @@ func (s *getserver) Get(ctx context.Context, msg *pb.QueryMessage) (*pb.ReplyMes
 	//TODO: buscar en los txt numero de soldados de un sector y base
 	fp, err := os.Open(msg.Sector + ".txt")
 	CustomFatal(err)
+
+	fmt.Println("Get; " + "Sector: " + msg.Sector + " Base: " + msg.Base)
 
 	var lines []string
 	scanner := bufio.NewScanner(fp)
