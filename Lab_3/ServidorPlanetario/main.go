@@ -151,7 +151,7 @@ func (s *getserver) Get(ctx context.Context, msg *pb.QueryMessage) (*pb.ReplyMes
 			return &pb.ReplyMessage{Valor: words[2]}, nil
 		}
 	}
-	return &pb.ReplyMessage{Valor: "1"}, nil
+	return &pb.ReplyMessage{Valor: "No existe: 0"}, nil
 }
 
 func startGetService(getServer *grpc.Server, getLis net.Listener) {

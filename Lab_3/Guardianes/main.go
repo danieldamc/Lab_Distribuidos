@@ -35,7 +35,7 @@ func GetSoldados(sector string, base string) {
 	if err != nil {
 		panic("No se puede crear el mensaje " + err.Error())
 	}
-	fmt.Printf(res.Valor + "\n")
+	//fmt.Printf(res.Valor + "\n")
 	direccion_planeta := res.Valor
 	connS.Close()
 
