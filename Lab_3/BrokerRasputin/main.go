@@ -21,7 +21,7 @@ var PlanetaryServer *grpc.Server
 var GetServer *grpc.Server
 
 var RECIBIDO = "MENSAJE RECIBIDO"
-var mapa_conecciones = [3]string{"dist150:49500", "dist151:49500", "dist152:49500"}
+var mapa_conecciones = [3]string{"dist150:50500", "dist151:50500", "dist152:50500"}
 
 type getserver struct {
 	pb.UnimplementedGetServiceServer
@@ -108,26 +108,6 @@ func closeDataNode(ip string, port string) {
 }*/
 
 func (s *getserver) Get(ctx context.Context, msg *pb.QueryMessage) (*pb.ReplyMessage, error) {
-	//mapa_conecciones := map[string]string{"Tierra": "dist150:49500", "Titan": "dist151:49500", "Marte": "dist152:49500"}
-
-	/*
-		connS, err := grpc.Dial(mapa_conecciones["Tierra"], grpc.WithInsecure())
-
-		if err != nil {
-			panic("No se pudo conectar con el servidor" + err.Error())
-		}
-		service := pb.NewGetServiceClient(connS)
-
-		res, err := service.Get(context.Background(),
-			&pb.QueryMessage{
-				Sector: msg.Sector,
-				Base:   msg.Base,
-			})
-
-		if err != nil {
-			panic("No se puede crear el mensaje " + err.Error())
-		}*/
-
 	return &pb.ReplyMessage{Valor: mapa_conecciones[rand.Intn(len(mapa_conecciones))]}, nil
 }
 
